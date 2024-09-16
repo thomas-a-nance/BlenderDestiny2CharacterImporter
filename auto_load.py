@@ -5,6 +5,7 @@ import typing
 import inspect
 import pkgutil
 import importlib
+import subprocess
 from pathlib import Path
 
 __all__ = (
@@ -34,6 +35,7 @@ def register():
             continue
         if hasattr(module, "register"):
             module.register()
+        installPackages()     
 
 def unregister():
     for cls in reversed(ordered_classes):
@@ -48,7 +50,19 @@ def unregister():
 
 # Import modules
 #################################################
+def installPackages():
+    try:
+        import requests
+    except:
+        python_exe = os.path.join(sys.prefix, 'bin', 'python.exe')
+        # upgrade pip
+        subprocess.call([python_exe, "-m", "ensurepip"])
+        subprocess.call([python_exe, "-m", "pip", "install", "--upgrade", "pip"])
+        # install required packages
+        subprocess.call([python_exe, "-m", "pip", "install", str(requests)])   
 
+
+        
 def get_all_submodules(directory):
     return list(iter_submodules(directory, __package__))
 
