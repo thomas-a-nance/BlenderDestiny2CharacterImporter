@@ -59,9 +59,7 @@ def installPackages():
         subprocess.call([python_exe, "-m", "ensurepip"])
         subprocess.call([python_exe, "-m", "pip", "install", "--upgrade", "pip"])
         # install required packages
-        subprocess.call([python_exe, "-m", "pip", "install", str(requests)])   
-
-
+        subprocess.call([python_exe, "-m", "pip", "install", str(requests)])
         
 def get_all_submodules(directory):
     return list(iter_submodules(directory, __package__))

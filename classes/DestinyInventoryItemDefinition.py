@@ -1,0 +1,70 @@
+from ctypes import *
+from ..classes import DestinyItemInventoryBlockDefinition
+from ..classes import DestinyDisplayPropertiesDefinition
+
+class DestinyInventoryItemDefinition:
+    DisplayProperties: DestinyDisplayPropertiesDefinition
+    Inventory: DestinyItemInventoryBlockDefinition
+    #TooltipNotifications: DestinyItemTooltipNotification
+    #BackgroundColor: DestinyColor
+    #Action: DestinyItemActionBlockDefinition
+    #Crafting: DestinyItemCraftingBlockDefinition
+    #SetData: DestinyItemSetBlockDefinition
+    #Stats: DestinyItemStatBlockDefinition
+    #EquippingBlock: DestinyEquippingBlockDefinition
+    #TranslationBlock: DestinyItemTranslationBlockDefinition
+    #Preview: DestinyItemPreviewBlockDefinition
+    #Quality: DestinyItemQualityBlockDefinition
+    #Value: DestinyItemValueBlockDefinition
+    #SourceData: DestinyItemSourceBlockDefinition
+    #Objectives: DestinyItemObjectiveBlockDefinition
+    #Metrics: DestinyItemMetricBlockDefinition
+    #Plug: DestinyItemPlugDefinition
+    #Gearset: DestinyItemGearsetBlockDefinition
+    #Sack: DestinyItemSackBlockDefinition
+    #Sockets: DestinyItemSocketBlockDefinition
+    #Summary: DestinyItemSummaryBlockDefinition
+    #TalentGrid: DestinyItemTalentGridBlockDefinition
+    #InvestmentStats: List<DestinyItemInvestmentStatDefinition>
+    #Perks: List<DestinyItemPerkEntryDefinition>
+    #Animations: List<DestinyAnimationReference>
+    #Links: List<HyperlinkReference>
+    #SpecialItemType: SpecialItemType
+    #ItemType: DestinyItemType
+    #ItemSubType: DestinyItemSubType
+    #ClassType: DestinyClass
+    #BreakerType: DestinyBreakerType
+    #DamageTypes: List<DamageType>
+    #DefaultDamageType: DamageType
+
+    CollectibleHash:  c_uint
+    IconWatermark: str
+    IconWatermarkShelved: str
+    SecondaryIcon: str
+    SecondaryOverlay: str
+    SecondarySpecial: str
+    Screenshot: str
+    ItemTypeDisplayName: str
+    FlavorText: str
+    UiItemDisplayStyle: str
+    ItemTypeAndTierDisplayName: str
+    DisplaySource: str
+    TooltipStyle: str
+    EmblemObjectiveHash: c_uint
+    LoreHash: c_uint
+    SummaryItemHash: c_uint
+    AllowActions: bool
+    DoesPostmasterPullHaveSideEffects: bool
+    NonTransferrable: bool
+    ItemCategoryHashes: list[c_uint]
+    BreakerTypeHash: c_uint
+    Equippable: bool
+    DamageTypeHashes: list[c_uint]
+    DefaultDamageTypeHash: c_uint
+    SeasonHash: c_uint
+    IsWrapper: bool
+    TraitIds: list[str]
+    TraitHashes: list[c_uint]
+    Hash: c_uint
+    Index: c_long
+    Redacted: bool
