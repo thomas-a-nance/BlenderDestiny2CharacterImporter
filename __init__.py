@@ -1,7 +1,7 @@
 import bpy
 import asyncio
 import bpy.utils.previews  # type: ignore
-from .panels import MainPanel
+from .methods import helpermethods
 
 bl_info = {
     "name" : "Destiny 2 Character Importer",
@@ -24,25 +24,31 @@ asyncio.set_event_loop(asyncio.new_event_loop())
 from . import auto_load
 auto_load.init()
 
+from .panels import MainPanel
 main_classes = (
-    MainPanel.VIEW3D_PT_Destiny2_Character_Importer_Properties,
-    MainPanel.VIEW3D_OT_Destiny2_Character_Importer_InitializeDatabase,
-    MainPanel.VIEW3D_PT_Destiny2_Character_Importer,
-    MainPanel.VIEW3D_OT_Destiny2_Character_Importer_DatabaseRefresh
+    MainPanel.VIEW3D_PT_D2CI,
+    MainPanel.VIEW3D_PG_D2CI_Props,
+    MainPanel.VIEW3d_PG_D2CI_PanelDisplay,
+    MainPanel.VIEW3D_OT_D2CI_SaveSettings,
+    MainPanel.VIEW3D_OT_D2CI_Reinitialize,
+    MainPanel.VIEW3D_OT_D2CI_BuildAGuardian,
+    MainPanel.VIEW3D_OT_D2CI_Settings
 )
 
 def register():
-    from .methods import helpermethods
+    helpermethods.LoadIcons()
+    helpermethods.InitConfig()
 
     from bpy.utils import register_class
     for cls in main_classes:
         register_class(cls)
 
-    helpermethods.InitConfig()
-    bpy.types.Scene.d2ci = bpy.props.PointerProperty(type=MainPanel.VIEW3D_PT_Destiny2_Character_Importer_Properties)
+    bpy.types.Scene.d2ci = bpy.props.PointerProperty(type=MainPanel.VIEW3D_PG_D2CI_Props)
+    bpy.types.WindowManager.d2ciMainPanel = bpy.props.PointerProperty(type=MainPanel.VIEW3d_PG_D2CI_PanelDisplay)
 
 def unregister():
     from bpy.utils import unregister_class
+    helpermethods.UnloadIcon()
     for cls in reversed(main_classes):
         unregister_class(cls)
     del bpy.types.Scene.d2ci
