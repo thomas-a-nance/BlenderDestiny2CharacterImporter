@@ -85,16 +85,12 @@ class ConfigManager():
 class CustomIconManager():
     IconCollection = {}
     IconDirectory = os.path.join(Path(os.path.dirname(__file__)).parent, "Resources", "images")
-    PatchSignal = "PATCHME:"
 
     def __init__(self):
         self.IconCollection = bpy.utils.previews.new()
 
     def __destroy__(self):
         bpy.utils.previews.remove(self.IconCollection)
-
-    def SetPatchSignal(self, name):
-        return self.PatchSignal + name
 
     def GetIconId(self, identifier):
         if os.path.exists(os.path.join(self.IconDirectory, identifier + ".png")):
