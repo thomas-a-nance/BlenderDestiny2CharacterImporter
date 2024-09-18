@@ -29,6 +29,7 @@ main_classes = (
     MainPanel.VIEW3D_PT_D2CI,
     MainPanel.VIEW3D_OT_D2CI_SaveSettings,
     MainPanel.VIEW3D_OT_D2CI_Reinitialize,
+    MainPanel.VIEW3D_OT_D2CI_SearchAPI
 )
 
 def register():

@@ -38,6 +38,9 @@ def getAsyncioLoop():
 def GetProjectLocalPath():
     return os.path.join(tempfile.gettempdir(), ProjectLocalStorageFolderName)
 
+def GetProjectTempImagePath():
+    return os.path.join(GetProjectLocalPath(), "TempImages")
+
 def GetProjectResourcesPath():
     return os.path.join(GetProjectLocalPath(), "Resources")
 

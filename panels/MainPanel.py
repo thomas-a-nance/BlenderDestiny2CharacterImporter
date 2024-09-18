@@ -1,8 +1,17 @@
 import bpy
 from ..methods import helpermethods
 from ..methods import manifest
+from ..methods import APISearchService
+
+ImageCollection = {}
 
 #region Functions & Enums
+def SearchAPI(self, context):
+    global ImageCollection
+    apiSearch = context.window_manager.d2ci.D2APISearchBar
+    ImageCollection = APISearchService.GetAPISearchResultsByName(apiSearch)
+    return {'FINISHED'}
+
 def SaveSettings(self, context):
     selectedDestiny2PackagesFolder = context.window_manager.d2ci.D2PackageFilePath
     selectedPackagePathIsValid = manifest.ValidateDestiny2PackageFolderLocation(selectedDestiny2PackagesFolder)
@@ -32,7 +41,7 @@ class VIEW3D_PG_D2CI_Props(bpy.types.PropertyGroup):
     )
 
     D2APISearchBar: bpy.props.StringProperty(
-        name="D2APISearchBar",
+        name="API Search",
         description="Search the D2 API for an item",
         default="",
         maxlen=1024
@@ -52,13 +61,21 @@ class VIEW3D_PG_D2CI_Props(bpy.types.PropertyGroup):
 # ------------------------------------------------------------------------
 #    Panel Buttons
 # ------------------------------------------------------------------------
+class VIEW3D_OT_D2CI_SearchAPI(bpy.types.Operator):
+    bl_idname = "view3d.d2ci_searchapi"
+    bl_label = "Search API"
+    bl_icon = "VIEWZOOM"
+    bl_description = "Search the D2 API for an item"
+
+    def execute(self, context):
+        return SearchAPI(self, context)
 
 class VIEW3D_OT_D2CI_Reinitialize(bpy.types.Operator):
     bl_idname = "view3d.d2ci_reinitialize"
     bl_label = "Reinitialize"
     bl_icon = "TRASH"
     bl_description = "Clears the version number, forcing the manifest to be redownloaded on save"
-
+    
     def execute(self, context):
         helpermethods.SetConfigItem('General','ManifestVersionNumber','')
         return {'FINISHED'}
@@ -83,7 +100,6 @@ class VIEW3D_PT_D2CI(bpy.types.Panel):  # class naming convention ‘CATEGORY_PT
 
     def draw(self, context):
         ctx = context.window_manager.d2ci
-        activePanels = ctx.bl_rna.properties["MainPanelEnum"].enum_items_static
         col = self.layout.column(align=True)
         row = col.row(align=True)
         row.alignment = 'RIGHT'
@@ -94,23 +110,30 @@ class VIEW3D_PT_D2CI(bpy.types.Panel):  # class naming convention ‘CATEGORY_PT
             row.prop(MainPanelMenu(ctx), 'MainPanelEnum', expand=True, icon_only=True)
         else:
             ctx.MainPanelEnum = "SETTINGS"
-
+        
         match ctx.MainPanelEnum:
             case "BAG":
-                
+                row = self.layout.row(align=True)
+                row.alignment = "CENTER"
+                row.label(text="API Search")
+                row = self.layout.row(align=True)
+                row.column()
+                row.prop(ctx, "D2APISearchBar", text="")
+                searchButton = row.column()
+                searchButton.operator(VIEW3D_OT_D2CI_SearchAPI.bl_idname, text="", icon=VIEW3D_OT_D2CI_SearchAPI.bl_icon)
                 return
             case _:
                 row = self.layout.row(align=True)
                 row.alignment = "CENTER"
                 row.label(text="D2 Package Folder")
                 row = self.layout.row()
-                row.prop(ctx, "D2PackageFilePath")
+                row.prop(ctx, "D2PackageFilePath", text="")
 
                 self.layout.separator(factor=2, type="LINE")
 
                 row = self.layout.row(align=True)
                 saveSettings = row.column()
-                saveSettings.operator(VIEW3D_OT_D2CI_SaveSettings.bl_idname, text=helpermethods.GetConfigItem('Labels','SaveSettings'))
+                saveSettings.operator(VIEW3D_OT_D2CI_SaveSettings.bl_idname, text=VIEW3D_OT_D2CI_SaveSettings.bl_label)
 
                 refreshButton = row.column()
                 refreshButton.operator(VIEW3D_OT_D2CI_Reinitialize.bl_idname, text="", icon=VIEW3D_OT_D2CI_Reinitialize.bl_icon)

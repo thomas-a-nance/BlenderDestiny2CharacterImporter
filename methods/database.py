@@ -5,11 +5,11 @@ from ..methods import helpermethods
 databaseFileName = 'D2ItemInventory'
 tableListToLoad = ['DestinyInventoryItemDefinition']
 
-def QueryManifestByLikeString(manifestName, queryString, limit=10):
+def QueryManifestByName(manifestName, queryString, limit=10):
     con = sqlite3.connect(helpermethods.GetManifestLocalPath())
     cur = con.cursor()
     try:
-        sqlStr = "SELECT * from " + manifestName + " where json like '%" + queryString.replace('"', '\\"') + "%' limit " + str(limit)
+        sqlStr = "SELECT * from " + manifestName + " where json like '%\"name\":\"" + queryString.replace('"', '\\"') + "%' limit " + str(limit)
         cur.execute(sqlStr)
         records = cur.fetchall()
         recordsDict = {}
