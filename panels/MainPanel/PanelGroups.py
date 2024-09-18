@@ -21,7 +21,7 @@ class VIEW3D_PG_D2CI_Props(bpy.types.PropertyGroup):
         name = 'Main Panel',
         description = 'D2CI Main Panel',
         items = [
-            ('BAG', 'Build-A-Guardian', 'Build a guardian from Destiny 2 to import into the scene', bpy.types.WindowManager.d2ci_icons.SetPatchSignal("bag"), 0),
+            ('BAG', 'Build-A-Guardian', 'Build a guardian from Destiny 2 to import into the scene', bpy.types.WindowManager.d2ci_icons.GetIconId("bag"), 0),
             ('SETTINGS', 'Settings', 'Modify settings for D2CI', "SETTINGS", 1)
         ],
         default = 'BAG'

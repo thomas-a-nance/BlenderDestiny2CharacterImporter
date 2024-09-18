@@ -1,6 +1,6 @@
 import bpy
 import asyncio
-import bpy.utils.previews  # type: ignore
+import os
 from .methods import helpermethods
 
 bl_info = {
@@ -22,6 +22,7 @@ asyncio.set_event_loop(asyncio.new_event_loop())
 
 bpy.types.WindowManager.d2ci_icons = helpermethods.CustomIconManager()
 bpy.types.WindowManager.d2ci_config = helpermethods.ConfigManager()
+preview_collections = {}
 
 from . import auto_load
 auto_load.init()
@@ -36,9 +37,7 @@ main_classes = (
     PanelGroups.VIEW3D_PG_D2CI_Props
 )
 
-def register():    
-    bpy.types.WindowManager.d2ci_icons.LoadIcons()
-    bpy.types.WindowManager.d2ci_icons.PatchIcons(PanelGroups.VIEW3D_PG_D2CI_Props)
+def register():
     bpy.types.WindowManager.d2ci_config.InitConfig()
 
     for cls in main_classes:
@@ -47,7 +46,6 @@ def register():
     bpy.types.WindowManager.d2ci = bpy.props.PointerProperty(type=PanelGroups.VIEW3D_PG_D2CI_Props)
 
 def unregister():
-    bpy.types.WindowManager.d2ci_icons.UnloadIcon()
     for cls in reversed(main_classes):
         bpy.utils.unregister_class(cls)
 
