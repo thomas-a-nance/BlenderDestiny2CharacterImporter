@@ -20,32 +20,35 @@ asyncio.set_event_loop(asyncio.new_event_loop())
 #    Registration
 # ------------------------------------------------------------------------
 
-#packages
+bpy.types.WindowManager.d2ci_icons = helpermethods.CustomIconManager()
+bpy.types.WindowManager.d2ci_config = helpermethods.ConfigManager()
+
 from . import auto_load
 auto_load.init()
 
-from .panels import MainPanel
+from .panels.MainPanel import Panel, Operators, PanelGroups
+
 main_classes = (
-    MainPanel.VIEW3D_PT_D2CI,
-    MainPanel.VIEW3D_OT_D2CI_SaveSettings,
-    MainPanel.VIEW3D_OT_D2CI_Reinitialize,
-    MainPanel.VIEW3D_OT_D2CI_SearchAPI
+    Panel.VIEW3D_PT_D2CI,
+    Operators.VIEW3D_OT_D2CI_SaveSettings,
+    Operators.VIEW3D_OT_D2CI_Reinitialize,
+    Operators.VIEW3D_OT_D2CI_SearchAPI,
+    PanelGroups.VIEW3D_PG_D2CI_Props
 )
 
-def register():
-    helpermethods.LoadIcons()
-    helpermethods.InitConfig()
+def register():    
+    bpy.types.WindowManager.d2ci_icons.LoadIcons()
+    bpy.types.WindowManager.d2ci_icons.PatchIcons(PanelGroups.VIEW3D_PG_D2CI_Props)
+    bpy.types.WindowManager.d2ci_config.InitConfig()
 
-    from bpy.utils import register_class
-    bpy.utils.register_class(helpermethods.patch_custom_icons(MainPanel.VIEW3D_PG_D2CI_Props))
     for cls in main_classes:
-        register_class(cls)
+        bpy.utils.register_class(cls)
 
-    bpy.types.WindowManager.d2ci = bpy.props.PointerProperty(type=MainPanel.VIEW3D_PG_D2CI_Props)
+    bpy.types.WindowManager.d2ci = bpy.props.PointerProperty(type=PanelGroups.VIEW3D_PG_D2CI_Props)
 
 def unregister():
-    from bpy.utils import unregister_class
-    helpermethods.UnloadIcon()
+    bpy.types.WindowManager.d2ci_icons.UnloadIcon()
     for cls in reversed(main_classes):
-        unregister_class(cls)
+        bpy.utils.unregister_class(cls)
+
     del bpy.types.WindowManager.d2ci

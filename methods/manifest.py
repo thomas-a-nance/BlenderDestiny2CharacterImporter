@@ -1,10 +1,10 @@
+import bpy
 import os
 import requests
 import zipfile
 import shutil
-from ..methods import helpermethods
 from ..methods import webcalls
-from ..methods import database
+from ..methods import helpermethods
 
 baseUrl = 'https://bungie.net'
 manifestUrl = '/Platform/Destiny2/Manifest/'
@@ -12,7 +12,7 @@ manifestUrl = '/Platform/Destiny2/Manifest/'
 def ValidateDestiny2PackageFolderLocation(folderPath):
     if not os.path.exists(folderPath):
         return False
-    if(folderPath != helpermethods.GetConfigItem('General','Destiny2PackageFileLocation')):
+    if(folderPath != bpy.types.WindowManager.d2ci_config.GetConfigItem('General','Destiny2PackageFileLocation')):
         return any(fname.endswith('.pkg') for fname in os.listdir(folderPath))
     return True
 
@@ -24,14 +24,14 @@ def LoadD2Database():
     d2ItemDefinitionURL = baseUrl + d2Manifest["Response"]["mobileWorldContentPaths"]["en"]
     folderPath = helpermethods.GetProjectResourcesPath()
     manifestPickle = helpermethods.GetManifestLocalPath()
-    if os.path.exists(os.path.join(folderPath, helpermethods.DownloadInProgressIndicatorFileName)) or not os.path.exists(manifestPickle) or helpermethods.GetConfigItem('General','ManifestVersionNumber') != d2ManifestVersion:
+    if os.path.exists(os.path.join(folderPath, helpermethods.DownloadInProgressIndicatorFileName)) or not os.path.exists(manifestPickle) or bpy.types.WindowManager.d2ci_config.GetConfigItem('General','ManifestVersionNumber') != d2ManifestVersion:
         loop.run_until_complete(DownloadManifestContent(d2ItemDefinitionURL, folderPath))
 
-    elif helpermethods.GetConfigItem('General','ManifestVersionNumber') == d2ManifestVersion:
+    elif bpy.types.WindowManager.d2ci_config.GetConfigItem('General','ManifestVersionNumber') == d2ManifestVersion:
         if not os.path.exists(manifestPickle):
             loop.run_until_complete(DownloadManifestContent(d2ItemDefinitionURL, folderPath))
  
-    helpermethods.SetConfigItem('General', 'ManifestVersionNumber', d2ManifestVersion)
+    bpy.types.WindowManager.d2ci_config.SetConfigItem('General', 'ManifestVersionNumber', d2ManifestVersion)
     return 
 
 async def GetDestiny2ManifestFromAPI():
@@ -61,6 +61,4 @@ async def DownloadManifestContent(d2ItemDefinitionURL, folderPath):
     print("Database Built")
     os.remove(tmpFileLocation)
     os.remove(downloadIndicator)
-
-    testQuery = database.QueryManifestByLikeString('DestinyInventoryItemDefinition', 'NPA "Weir-Walker" R')
     return
