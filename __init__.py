@@ -22,7 +22,6 @@ asyncio.set_event_loop(asyncio.new_event_loop())
 
 bpy.types.WindowManager.d2ci_icons = helpermethods.CustomIconManager()
 bpy.types.WindowManager.d2ci_config = helpermethods.ConfigManager()
-preview_collections = {}
 
 from . import auto_load
 auto_load.init()

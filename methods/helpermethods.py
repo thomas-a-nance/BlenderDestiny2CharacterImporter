@@ -39,7 +39,7 @@ class ConfigManager():
             }
         }'''
 
-    def __destroy__(self):
+    def __del__(self):
         self.config = None
 
     def InitConfig(self):
@@ -89,7 +89,7 @@ class CustomIconManager():
     def __init__(self):
         self.IconCollection = bpy.utils.previews.new()
 
-    def __destroy__(self):
+    def __del__(self):
         bpy.utils.previews.remove(self.IconCollection)
 
     def GetIconId(self, identifier):
