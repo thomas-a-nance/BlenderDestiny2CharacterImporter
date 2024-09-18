@@ -28,11 +28,8 @@ from .panels import MainPanel
 main_classes = (
     MainPanel.VIEW3D_PT_D2CI,
     MainPanel.VIEW3D_PG_D2CI_Props,
-    MainPanel.VIEW3d_PG_D2CI_PanelDisplay,
     MainPanel.VIEW3D_OT_D2CI_SaveSettings,
     MainPanel.VIEW3D_OT_D2CI_Reinitialize,
-    MainPanel.VIEW3D_OT_D2CI_BuildAGuardian,
-    MainPanel.VIEW3D_OT_D2CI_Settings
 )
 
 def register():
@@ -40,6 +37,7 @@ def register():
     helpermethods.InitConfig()
 
     from bpy.utils import register_class
+    bpy.utils.register_class(helpermethods.patch_custom_icons(MainPanel.VIEW3d_PG_D2CI_PanelDisplay))
     for cls in main_classes:
         register_class(cls)
 

@@ -23,6 +23,8 @@ DownloadInProgressIndicatorFileName = "download_in_progress"
 IconCollection = None
 IconDirectory = os.path.join(Path(os.path.dirname(__file__)).parent, "Resources", "images")
 
+PatchSignal = "PATCHME:"
+
 def __destroy__():
     config = None
     UnloadIcon()
@@ -101,9 +103,35 @@ def LoadIcons():
 def UnloadIcon():
     bpy.utils.previews.remove(IconCollection)
 
-class IconsMock:
-    def get(self, identifier):
-        return GetIcon(identifier)
+def patch_custom_icons(cls):
+    """because properties are defined in __annotation__ space, we cannot get custom icon value as icons are not registered yet
+    thus we need to re-sample the icons right before registering the PropertyGroup, this function will patch EnumProperty when needed"""
 
-icons = IconsMock()
+    def patch_needed(itm):
+        """check if this item need to be patched, if the icon element of the item has a patchsignal"""
+        return type(itm[3]) is str and itm[3].startswith(PatchSignal) #3rd element of an item is always the icon, see blender doc
+
+    def patch_item(itm):
+        """patch icon element of an item if needed"""
+        if patch_needed(itm):
+            return tuple(GetIconId(e.replace(PatchSignal,"")) if (type(e) is str and e.startswith(PatchSignal)) else e for e in itm)
+        return itm
+
+    #for all EnumProperties initialized in cls.annotation space, 
+    #that have more than 3 element per items 
+    #& have at least one icon str value with the patch signal
+
+    for propname,prop in [(propname,prop) for propname,prop in cls.__annotations__.items() 
+               if (repr(prop.function)=="<built-in function EnumProperty>")
+               and (len(prop.keywords["items"][0])>3)
+               and len([itm for itm in prop.keywords["items"] if patch_needed(itm)])
+               ]:
+
+        #if found monkey-patch new items tuple w correct icon values
+        prop.keywords["items"] = tuple(patch_item(itm) for itm in prop.keywords["items"])
+
+        #print(f"icon patched: {cls}{propname}")
+        continue
+
+    return cls 
 #endregion
