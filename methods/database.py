@@ -5,7 +5,10 @@ from ..methods import helpermethods
 databaseFileName = 'D2ItemInventory'
 tableListToLoad = ['DestinyInventoryItemDefinition']
 
-def QueryManifestByName(manifestName, queryString, limit=10):
+def QueryManifestByName(manifestName, queryString, limit=16):
+    if len(queryString) == 0:
+        return {}
+    
     con = sqlite3.connect(helpermethods.GetManifestLocalPath())
     cur = con.cursor()
     try:

@@ -1,6 +1,5 @@
 import asyncio
 import requests
-import glob
 import os
 from ..methods import helpermethods
 
@@ -14,21 +13,18 @@ def Get(url, headers={}):
     return requests.get(url, headers=headers, timeout=None, stream=True)
 
 def SaveImagesFromSearch(imageInfoObj):
-    removing_files = glob.glob(os.path.join(helpermethods.GetProjectTempImagePath(), '*.jpg'))
-    for i in removing_files:
-        os.remove(i)
     os.makedirs(helpermethods.GetProjectTempImagePath(), mode=0o777, exist_ok=True)
 
     for imageToGet in imageInfoObj:
-        GetAndSaveImage(imageToGet[0], imageToGet[2])
+        GetAndSaveImage(imageToGet[0], imageToGet[1])
 
     return
 
 @background
-def GetAndSaveImage(key, url):
+def GetAndSaveImage(url, downloadName):
     path = "https://bungie.net" + url
     imageData = Get(path)
     if imageData.status_code == 200:
-        with open(os.path.join(helpermethods.GetProjectTempImagePath(), str(key)+ ".jpg"), 'wb') as f:
+        with open(downloadName, 'wb') as f:
             for chunk in imageData:
                 f.write(chunk)

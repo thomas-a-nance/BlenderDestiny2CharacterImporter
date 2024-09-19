@@ -4,6 +4,7 @@ import configparser
 import asyncio
 import tempfile
 import json
+import shutil
 from pathlib import Path
 
 ProjectLocalStorageFolderName = "BlenderD2CI"
@@ -28,10 +29,16 @@ def GetProjectResourcesPath():
 def GetManifestLocalPath():
     return os.path.join(GetProjectResourcesPath(), "Manifest.content")
 
+def GetProjectPath():
+    return Path(os.path.dirname(__file__)).parent
+
+def GetProjectImagePath():
+    return os.path.join(GetProjectPath(), "Resources", "images")
+
 #region Config
 class ConfigManager():
     config = configparser.ConfigParser()
-    configFileName = os.path.join(tempfile.gettempdir(), "BlenderD2CI", "config.ini")
+    configFileName = os.path.join(GetProjectLocalPath(), "config.ini")
     configOptions = '''{
             "General": {
                 "ManifestVersionNumber": "",
@@ -84,7 +91,7 @@ class ConfigManager():
 #region Icons
 class CustomIconManager():
     IconCollection = {}
-    IconDirectory = os.path.join(Path(os.path.dirname(__file__)).parent, "Resources", "images")
+    IconDirectory = GetProjectImagePath()
 
     def __init__(self):
         self.IconCollection = bpy.utils.previews.new()
@@ -101,5 +108,60 @@ class CustomIconManager():
         if identifier in self.IconCollection:
             return self.IconCollection[identifier]
         
-        return self.IconCollection.load(identifier, os.path.join(self.IconDirectory, identifier + ".png"), "IMAGE")        
+        return self.IconCollection.load(identifier, os.path.join(self.IconDirectory, identifier + ".png"), "IMAGE")
+
+class SearchResultsManager():
+    ResultsCollection = {}
+    QueryResults = {}
+    SearchResultsDirectory = GetProjectTempImagePath()
+    ProjectImageDirectory = GetProjectImagePath()
+    DefaultEngramImage = 'engram.png'
+    IsNewCollection = True
+
+    def __init__(self):
+        self.ResultsCollection = bpy.utils.previews.new()
+
+    def __del__(self):
+        bpy.utils.previews.remove(self.ResultsCollection)
+
+    def SetQueryResultsFromSearch(self, results):
+        self.QueryResults = results
+
+    def ClearCollectionAndFolder(self):
+        self.ResetCollection()
+        shutil.rmtree(self.SearchResultsDirectory, ignore_errors=True)
+        os.makedirs(self.SearchResultsDirectory, mode=0o777, exist_ok=True)
+
+    def ResetCollection(self):
+        self.ResultsCollection.clear()
+        self.IsNewCollection = True
+
+    def GetCollectionAsEnum(self):
+        enumItems = []
+
+        if os.path.exists(self.SearchResultsDirectory) and len(os.listdir(self.SearchResultsDirectory)) > 0:
+            for i, name in enumerate(os.listdir(self.SearchResultsDirectory)):
+                filepath = os.path.join(self.SearchResultsDirectory, name)
+                enumItems.append(self.GetItemForEnum(i+1, name, filepath))
+
+        self.IsNewCollection = False
+        return enumItems
+    
+    def GetItemForEnum(self, i, name, filepath):
+        icon = self.ResultsCollection.get(name)
+        if not icon:
+            thumb = self.ResultsCollection.load(name, filepath, 'IMAGE')
+        else:
+            thumb = self.ResultsCollection[name]
+
+        intFlag = True
+        try:
+            displayName = name
+            itemId = int(Path(name).stem)
+            if itemId in self.QueryResults.keys():
+                displayName = self.QueryResults.get(itemId).get('displayProperties').get('name')
+
+            return (name, displayName, "", thumb.icon_id, i)
+        except:
+            return (name, name, "", thumb.icon_id, i)
 #endregion

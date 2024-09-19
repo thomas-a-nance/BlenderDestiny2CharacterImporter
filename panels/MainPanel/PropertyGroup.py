@@ -1,7 +1,8 @@
 import bpy
+from ..MainPanel import Functions
 from ...methods import helpermethods
 
-class VIEW3D_PG_D2CI_Props(bpy.types.PropertyGroup):
+class UI_PG_D2CI_Props(bpy.types.PropertyGroup):
     D2PackageFilePath: bpy.props.StringProperty(
         name="D2 Packages Folder",
         description="Path to Destiny 2 packages folder",
@@ -14,7 +15,8 @@ class VIEW3D_PG_D2CI_Props(bpy.types.PropertyGroup):
         name="API Search",
         description="Search the D2 API for an item",
         default="",
-        maxlen=1024
+        update=Functions.CheckForSearchAPI,
+        options = {'TEXTEDIT_UPDATE'}
     )
 
     MainPanelEnum: bpy.props.EnumProperty(
@@ -22,7 +24,13 @@ class VIEW3D_PG_D2CI_Props(bpy.types.PropertyGroup):
         description = 'D2CI Main Panel',
         items = [
             ('BAG', 'Build-A-Guardian', 'Build a guardian from Destiny 2 to import into the scene', bpy.types.WindowManager.d2ci_icons.GetIconId("bag"), 0),
-            ('SETTINGS', 'Settings', 'Modify settings for D2CI', "SETTINGS", 1)
+            ('SETTINGS', 'Settings', 'Modify settings for D2CI', bpy.types.WindowManager.d2ci_icons.GetIconId("settings"), 1)
         ],
         default = 'BAG'
+    )
+
+    SearchResultsEnum: bpy.props.EnumProperty(
+        name = 'SearchResults',
+        description = 'D2CI Main Panel',
+        items = Functions.GetSearchResultCollection
     )
