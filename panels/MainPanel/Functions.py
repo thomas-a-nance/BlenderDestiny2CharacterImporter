@@ -2,11 +2,7 @@ import bpy
 from ...methods import manifest, helpermethods, APISearchService
 
 def ForceRefreshUI(self, context):
-    if context.area is not None:
-        for region in context.area.regions:
-            if region.type == "UI":
-                region.tag_redraw()
-        return None
+    return None
 
 def SearchAPI(self, context):
     bpy.types.WindowManager.d2ci_search_results_manager.ClearCollectionAndFolder()

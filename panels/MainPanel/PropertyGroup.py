@@ -36,7 +36,8 @@ class UI_PG_D2CI_Props(bpy.types.PropertyGroup):
     IsSearchingAPI: bpy.props.BoolProperty(
         name = 'IsSearchingAPI',
         description = 'Is performing D2CI Search Results',
-        default = False
+        default = False,
+        update=Functions.ForceRefreshUI
     )
 
     SearchResultsEnum: bpy.props.EnumProperty(
