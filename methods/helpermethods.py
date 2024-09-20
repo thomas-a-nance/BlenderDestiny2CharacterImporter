@@ -7,12 +7,6 @@ from pathlib import Path
 ProjectLocalStorageFolderName = "BlenderD2CI"
 ItemDefinitionLocalStorageFolderName = "Destiny2ItemDefinition"
 DownloadInProgressIndicatorFileName = "download_in_progress"
-
-def getAsyncioLoop():
-    try:
-        return asyncio.get_event_loop()
-    except RuntimeError:
-        return asyncio.get_event_loop()
     
 def background(f):
     def wrapped(*args, **kwargs):

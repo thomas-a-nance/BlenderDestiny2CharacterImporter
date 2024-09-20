@@ -12,13 +12,13 @@ class CustomIconManager():
     def __del__(self):
         bpy.utils.previews.remove(self.IconCollection)
 
-    def GetIconId(self, identifier):
-        if os.path.exists(os.path.join(self.IconDirectory, identifier + ".png")):
-            return self.GetIcon(identifier).icon_id
+    def GetIconId(self, identifier, extension='.png'):
+        if os.path.exists(os.path.join(self.IconDirectory, identifier + extension)):
+            return self.GetIcon(identifier, extension).icon_id
         return "QUESTION"
 
-    def GetIcon(self, identifier):
+    def GetIcon(self, identifier, extension='.png'):
         if identifier in self.IconCollection:
             return self.IconCollection[identifier]
         
-        return self.IconCollection.load(identifier, os.path.join(self.IconDirectory, identifier + ".png"), "IMAGE")
+        return self.IconCollection.load(identifier, os.path.join(self.IconDirectory, identifier + extension), "IMAGE")

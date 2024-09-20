@@ -1,6 +1,5 @@
 import bpy
 from ..MainPanel import Functions
-from ...methods import helpermethods
 
 class UI_PG_D2CI_Props(bpy.types.PropertyGroup):
     D2PackageFilePath: bpy.props.StringProperty(
@@ -27,17 +26,11 @@ class UI_PG_D2CI_Props(bpy.types.PropertyGroup):
         default = 'BAG'
     )
 
-    SearchResultsCount: bpy.props.IntProperty(
-        name = 'SearchResultsCount',
+    SearchResultsText: bpy.props.StringProperty(
+        name = 'SearchResultsText',
         description = 'D2CI Search Results Count',
-        default = 0,
+        default = "",
         update=Functions.ForceRefreshUI
-    )
-
-    ShowSearchResultsCount: bpy.props.BoolProperty(
-        name = 'ShowSearchResultsCount',
-        description = 'Show D2CI Search Results Count',
-        default = False
     )
 
     IsSearchingAPI: bpy.props.BoolProperty(

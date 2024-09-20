@@ -38,19 +38,17 @@ class UI_PT_D2CI(bpy.types.Panel):  # class naming convention ‘CATEGORY_PT_nam
         row = self.layout.row(align=True)
         row.prop(ctx, "D2APISearchBar", text="")
 
-        if not ctx.IsSearchingAPI:
-            searchButton = row.column()
-            searchButton.operator(UI_OT_D2CI_SearchAPI.bl_idname, text="", icon=UI_OT_D2CI_SearchAPI.bl_icon)
-
-        if ctx.ShowSearchResultsCount:
+        searchButton = row.column()
+        searchButton.operator(UI_OT_D2CI_SearchAPI.bl_idname, text="", icon=UI_OT_D2CI_SearchAPI.bl_icon)
+        #searchButton.enabled = not ctx.IsSearchingAPI
+        if len(ctx.SearchResultsText) > 0:
             row = self.layout.row()
             row.alignment = "RIGHT"
-            resultsFound = str(ctx.SearchResultsCount)
-            row.label(text=f'{resultsFound} result{"s" if resultsFound == 1 else ""} found.')
+            row.label(text=ctx.SearchResultsText)
 
         self.layout.separator(factor=2, type="LINE")
 
-        if not ctx.ShowSearchResultsCount:
+        if not ctx.IsSearchingAPI:
             ctx.SearchResultsEnum = 'None'
         
         row = self.layout.row()
