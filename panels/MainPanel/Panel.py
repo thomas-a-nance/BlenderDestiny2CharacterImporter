@@ -37,11 +37,22 @@ class UI_PT_D2CI(bpy.types.Panel):  # class naming convention ‘CATEGORY_PT_nam
         row.label(text="API Search")
         row = self.layout.row(align=True)
         row.prop(ctx, "D2APISearchBar", text="")
-        searchButton = row.column()
-        searchButton.operator(UI_OT_D2CI_SearchAPI.bl_idname, text="", icon=UI_OT_D2CI_SearchAPI.bl_icon)
+
+        if not ctx.IsSearchingAPI:
+            searchButton = row.column()
+            searchButton.operator(UI_OT_D2CI_SearchAPI.bl_idname, text="", icon=UI_OT_D2CI_SearchAPI.bl_icon)
+
+        if ctx.ShowSearchResultsCount:
+            row = self.layout.row()
+            row.alignment = "RIGHT"
+            resultsFound = str(ctx.SearchResultsCount)
+            row.label(text=f'{resultsFound} result{"s" if resultsFound == 1 else ""} found.')
 
         self.layout.separator(factor=2, type="LINE")
 
+        if not ctx.ShowSearchResultsCount:
+            ctx.SearchResultsEnum = 'None'
+        
         row = self.layout.row()
         row.template_icon_view(ctx, 
             "SearchResultsEnum",
@@ -62,6 +73,7 @@ class UI_PT_D2CI(bpy.types.Panel):  # class naming convention ‘CATEGORY_PT_nam
         row = self.layout.row(align=True)
         saveSettings = row.column()
         saveSettings.operator(UI_OT_D2CI_SaveSettings.bl_idname, text=UI_OT_D2CI_SaveSettings.bl_label)
+        saveSettings.enabled = not bpy.types.WindowManager.d2ci_config.IsPopulatingManifestConfig
 
         refreshButton = row.column()
         refreshButton.operator(UI_OT_D2CI_Reinitialize.bl_idname, text="", icon=UI_OT_D2CI_Reinitialize.bl_icon)

@@ -15,8 +15,6 @@ class UI_PG_D2CI_Props(bpy.types.PropertyGroup):
         name="API Search",
         description="Search the D2 API for an item",
         default="",
-        update=Functions.CheckForSearchAPI,
-        options = {'TEXTEDIT_UPDATE'}
     )
 
     MainPanelEnum: bpy.props.EnumProperty(
@@ -29,8 +27,28 @@ class UI_PG_D2CI_Props(bpy.types.PropertyGroup):
         default = 'BAG'
     )
 
+    SearchResultsCount: bpy.props.IntProperty(
+        name = 'SearchResultsCount',
+        description = 'D2CI Search Results Count',
+        default = 0,
+        update=Functions.ForceRefreshUI
+    )
+
+    ShowSearchResultsCount: bpy.props.BoolProperty(
+        name = 'ShowSearchResultsCount',
+        description = 'Show D2CI Search Results Count',
+        default = False
+    )
+
+    IsSearchingAPI: bpy.props.BoolProperty(
+        name = 'IsSearchingAPI',
+        description = 'Is performing D2CI Search Results',
+        default = False
+    )
+
     SearchResultsEnum: bpy.props.EnumProperty(
         name = 'SearchResults',
-        description = 'D2CI Main Panel',
-        items = Functions.GetSearchResultCollection
+        description = 'D2CI Search Results Enum',
+        items = Functions.GetSearchResultCollection,
+        update=Functions.SelectSearchResult
     )

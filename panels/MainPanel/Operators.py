@@ -1,16 +1,6 @@
 import bpy
 from ..MainPanel import Functions
 
-class UI_OT_D2CI_CheckForSearchAPI(bpy.types.Operator):
-    bl_idname = "ui.d2ci_checkforsearchapi"
-    bl_label = "Check for Search API"
-
-    def invoke(self, context, event):
-        if event.type == 'RET' or event.type == 'NUMPAD_ENTER': 
-            if event.value == 'PRESS':
-                Functions.SearchAPI(self, context)
-        return {'FINISHED'}
-
 class UI_OT_D2CI_SearchAPI(bpy.types.Operator):
     bl_idname = "ui.d2ci_searchapi"
     bl_label = "Search API"

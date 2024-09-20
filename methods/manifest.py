@@ -16,31 +16,31 @@ def ValidateDestiny2PackageFolderLocation(folderPath):
         return any(fname.endswith('.pkg') for fname in os.listdir(folderPath))
     return True
 
+@helpermethods.background
 def LoadD2Database():
-    loop = helpermethods.getAsyncioLoop()
-    d2ManifestQuery = loop.run_until_complete(GetDestiny2ManifestFromAPI())
+    d2ManifestQuery = GetDestiny2ManifestFromAPI()
     d2Manifest = d2ManifestQuery.json()
     d2ManifestVersion = d2Manifest["Response"]["version"]
     d2ItemDefinitionURL = baseUrl + d2Manifest["Response"]["mobileWorldContentPaths"]["en"]
     folderPath = helpermethods.GetProjectResourcesPath()
     manifestPickle = helpermethods.GetManifestLocalPath()
     if os.path.exists(os.path.join(folderPath, helpermethods.DownloadInProgressIndicatorFileName)) or not os.path.exists(manifestPickle) or bpy.types.WindowManager.d2ci_config.GetConfigItem('General','ManifestVersionNumber') != d2ManifestVersion:
-        loop.run_until_complete(DownloadManifestContent(d2ItemDefinitionURL, folderPath))
+        DownloadManifestContent(d2ItemDefinitionURL, folderPath)
 
     elif bpy.types.WindowManager.d2ci_config.GetConfigItem('General','ManifestVersionNumber') == d2ManifestVersion:
         if not os.path.exists(manifestPickle):
-            loop.run_until_complete(DownloadManifestContent(d2ItemDefinitionURL, folderPath))
+            DownloadManifestContent(d2ItemDefinitionURL, folderPath)
  
     bpy.types.WindowManager.d2ci_config.SetConfigItem('General', 'ManifestVersionNumber', d2ManifestVersion)
-    return 
+    bpy.types.WindowManager.d2ci_config.IsPopulatingManifestConfig = False
 
-async def GetDestiny2ManifestFromAPI():
+def GetDestiny2ManifestFromAPI():
     apiUrl = baseUrl + manifestUrl
     headers = {"Content-Type":"application/json", "X-API-KEY":"aa5aaca04c2d433f923e3cca8119dddf"}
     returnData = webcalls.Get(apiUrl, headers)
     return returnData
 
-async def DownloadManifestContent(d2ItemDefinitionURL, folderPath):
+def DownloadManifestContent(d2ItemDefinitionURL, folderPath):
     downloadIndicator = os.path.join(folderPath, helpermethods.DownloadInProgressIndicatorFileName)
     shutil.rmtree(folderPath, ignore_errors=True)
     os.makedirs(folderPath, mode=0o777, exist_ok=True)

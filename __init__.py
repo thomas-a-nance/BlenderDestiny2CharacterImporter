@@ -1,6 +1,9 @@
 import bpy
 import asyncio
 from .methods import helpermethods
+from .classes.SearchResultsManager import SearchResultsManager
+from .classes.ConfigManager import ConfigManager
+from .classes.CustomIconManager import CustomIconManager
 
 bl_info = {
     "name" : "Destiny 2 Character Importer",
@@ -19,9 +22,9 @@ asyncio.set_event_loop(asyncio.new_event_loop())
 #    Registration
 # ------------------------------------------------------------------------
 
-bpy.types.WindowManager.d2ci_icons = helpermethods.CustomIconManager()
-bpy.types.WindowManager.d2ci_search_results_manager = helpermethods.SearchResultsManager()
-bpy.types.WindowManager.d2ci_config = helpermethods.ConfigManager()
+bpy.types.WindowManager.d2ci_icons = CustomIconManager()
+bpy.types.WindowManager.d2ci_search_results_manager = SearchResultsManager()
+bpy.types.WindowManager.d2ci_config = ConfigManager()
 
 from . import auto_load
 auto_load.init()
@@ -33,7 +36,6 @@ main_classes = (
     Operators.UI_OT_D2CI_SaveSettings,
     Operators.UI_OT_D2CI_Reinitialize,
     Operators.UI_OT_D2CI_SearchAPI,
-    Operators.UI_OT_D2CI_CheckForSearchAPI,
     PropertyGroup.UI_PG_D2CI_Props,
 )
 

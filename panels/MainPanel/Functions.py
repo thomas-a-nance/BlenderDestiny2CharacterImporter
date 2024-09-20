@@ -1,18 +1,17 @@
 import bpy
 from ...methods import manifest
 from ...methods import APISearchService
-from ...panels.MainPanel import Functions
 
-def CheckForSearchAPI(self, context):
-    bpy.ops.ui.d2ci_checkforsearchapi('INVOKE_DEFAULT')
-    return
+def ForceRefreshUI(self, context):
+    for region in context.area.regions:
+        if region.type == "UI":
+            region.tag_redraw()
+    return None
 
 def SearchAPI(self, context):
     bpy.types.WindowManager.d2ci_search_results_manager.ClearCollectionAndFolder()
     apiSearch = context.window_manager.d2ci.D2APISearchBar
-    queryResults = APISearchService.GetAPISearchResultsByName(apiSearch)
-    bpy.types.WindowManager.d2ci_search_results_manager.SetQueryResultsFromSearch(queryResults)
-    bpy.types.WindowManager.d2ci_search_results_manager.ResetCollection()
+    APISearchService.GetAPISearchResultsByName(apiSearch, context)
     return {'FINISHED'}
 
 def SaveSettings(self, context):
@@ -22,6 +21,7 @@ def SaveSettings(self, context):
         self.report({"ERROR_INVALID_INPUT"}, "Directory selected is invalid, please select the correct packages directory.")
         return {'CANCELLED'}
     bpy.types.WindowManager.d2ci_config.SetConfigItem('General', 'Destiny2PackageFileLocation', selectedDestiny2PackagesFolder)
+    bpy.types.WindowManager.d2ci_config.IsPopulatingManifestConfig = True
     manifest.LoadD2Database()
     return {'FINISHED'}
 
@@ -31,3 +31,9 @@ def MainPanelMenu(context):
 
 def GetSearchResultCollection(self, context):
     return bpy.types.WindowManager.d2ci_search_results_manager.GetCollectionAsEnum()
+
+def SelectSearchResult(self, context):
+    try:
+        bpy.types.WindowManager.d2ci_search_results_manager.SelectEnumItem(int(context.window_manager.d2ci.SearchResultsEnum))
+    except:
+        bpy.types.WindowManager.d2ci_search_results_manager.ClearEnumItem()
