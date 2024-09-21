@@ -37,7 +37,7 @@ def RunMDE(item):
     outputFolder = configMgr.GetConfigItem('General','Destiny2OutputFileLocation')
 
     fileName = re.sub('[ -\"\']', '_', (item.get('class')+'_' if len(item.get('class')) > 0 else '') + item.get('name').lower())
-    foldersuffix = str(len([i for i in os.listdir(outputFolder) if os.path.isdir(i)]))
+    foldersuffix = str(len([i for i in os.listdir(outputFolder) if os.path.isdir(os.path.join(outputFolder,i))]))
     os.makedirs(os.path.join(outputFolder, fileName+'_'+foldersuffix), mode=0o777, exist_ok=True)
     finalOutputFolder = FixFilePathForArgs(os.path.join(outputFolder, fileName+'_'+foldersuffix))
 
