@@ -9,6 +9,16 @@ class UI_OT_D2CI_SearchAPI(bpy.types.Operator):
 
     def execute(self, context):
         return Functions.SearchAPI(self, context)
+    
+class UI_OT_D2CI_ClearCache(bpy.types.Operator):
+    bl_idname = "ui.d2ci_clearcache"
+    bl_label = "Clear Cache"
+    bl_icon = "BRUSH_DATA"
+    bl_description = "Clears the cache of images from query searches"
+    
+    def execute(self, context):
+        bpy.types.WindowManager.d2ci_search_results_manager.ClearCache()
+        return {'FINISHED'}
 
 class UI_OT_D2CI_Reinitialize(bpy.types.Operator):
     bl_idname = "ui.d2ci_reinitialize"

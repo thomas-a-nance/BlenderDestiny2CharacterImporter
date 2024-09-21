@@ -53,28 +53,40 @@ class UI_PT_D2CI(bpy.types.Panel):  # class naming convention ‘CATEGORY_PT_nam
             ctx.SearchResultsEnum = 'None'
         
         nPanelWidth = context.region.width #280 Default
-        searchResultWidth = 130
-        
-        if nPanelWidth < 350:
+        searchResultWidth = 150
+        nPanelViewSplit = 350
+
+        if nPanelWidth < nPanelViewSplit:
             row = self.layout.row()
         else:
-            row = self.layout.split(factor= (searchResultWidth / nPanelWidth))
+            row = self.layout.split(factor = (searchResultWidth / nPanelWidth))
             
         col = row.column()
         col.template_icon_view(ctx, 
             "SearchResultsEnum",
             show_labels=True,
-            scale=5,
+            scale=6,
             scale_popup=5
         )
-
-        if nPanelWidth < 350:
-            row = self.layout.row()
-
-        col = row.column()
-        col.alignment = 'LEFT'
-        col.label(text='Item Name')
-        col.label(text='Item ID')
+        
+        selectedEntry = bpy.types.WindowManager.d2ci_search_results_manager.SelectedSearchResultEntry
+        if selectedEntry != {}:
+            col = row.column()
+            col.alignment = 'LEFT'
+            col.label(text=selectedEntry.get('displayProperties').get('name'))
+            col.label()
+            col.label(text=str(selectedEntry.get('itemTypeDisplayName')))
+            if nPanelWidth < nPanelViewSplit:
+                row = self.layout.row()
+                col.label(text=selectedEntry.get('inventory').get('tierTypeName'))
+                col.label(text=str(selectedEntry.get('hash')))
+            else:
+                row = self.layout.row()
+                row2 = col.split(factor=0.5)
+                row2.alignment = 'LEFT'
+                row2.label(text=selectedEntry.get('inventory').get('tierTypeName'))
+                row2.alignment = 'RIGHT'
+                row2.label(text=str(selectedEntry.get('hash')))
 
     def DrawSettings(self, context):
         ctx = context.window_manager.d2ci
@@ -83,6 +95,15 @@ class UI_PT_D2CI(bpy.types.Panel):  # class naming convention ‘CATEGORY_PT_nam
         row.label(text="D2 Package Folder")
         row = self.layout.row()
         row.prop(ctx, "D2PackageFilePath", text="")
+
+        self.layout.separator(factor=2, type="LINE")
+
+        row = self.layout.row(align=True)
+        saveSettings = row.column()
+        saveSettings.label(text="Cache Size: " + str(bpy.types.WindowManager.d2ci_search_results_manager.GetCacheSize()))
+
+        refreshButton = row.column()
+        refreshButton.operator(UI_OT_D2CI_ClearCache.bl_idname, text="", icon=UI_OT_D2CI_ClearCache.bl_icon)
 
         self.layout.separator(factor=2, type="LINE")
 

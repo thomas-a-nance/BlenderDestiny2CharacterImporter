@@ -1,4 +1,5 @@
 import shutil
+import math
 from ..methods.helpermethods import *
 
 class SearchResultsManager():
@@ -24,6 +25,7 @@ class SearchResultsManager():
     def ClearCollectionAndFolder(self):
         self.ResultsCollection.clear()
         self.QueryResults = {}
+        self.SelectedSearchResultEntry = {}
         self.ClearEnumItem()
         shutil.rmtree(self.SearchResultsDirectory, ignore_errors=True)
         shutil.rmtree(self.TempResultDirectory, ignore_errors=True)
@@ -53,6 +55,21 @@ class SearchResultsManager():
             src_path = os.path.join(self.TempResultDirectory, f)
             dst_path = os.path.join(self.SearchResultsDirectory, f)
             shutil.move(src_path, dst_path)
+        
+    def ClearCache(self):
+        shutil.rmtree(self.CacheResultDirectory, ignore_errors=True)
+
+    def GetCacheSize(self):
+        cacheDirectory = Path(self.CacheResultDirectory)
+        byteSize = sum(f.stat().st_size for f in cacheDirectory.glob('**/*') if f.is_file())
+
+        if byteSize == 0:
+            return "0 B"
+        size_name = ("B", "KB", "MB", "GB", "TB", "PB", "EB", "ZB", "YB")
+        i = int(math.floor(math.log(byteSize, 1024)))
+        p = math.pow(1024, i)
+        s = round(byteSize / p, 2)
+        return "%s %s" % (s, size_name[i])
 
     def GetCollectionAsEnum(self):
         resultItems = []

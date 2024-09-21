@@ -36,6 +36,7 @@ main_classes = (
     Operators.UI_OT_D2CI_SaveSettings,
     Operators.UI_OT_D2CI_Reinitialize,
     Operators.UI_OT_D2CI_SearchAPI,
+    Operators.UI_OT_D2CI_ClearCache,
     PropertyGroup.UI_PG_D2CI_Props,
 )
 

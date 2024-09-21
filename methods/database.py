@@ -15,8 +15,8 @@ def QueryManifestByName(manifestName, queryString, rows=4):
     cur = con.cursor()
     try:
         sqlStr = "SELECT * from " + manifestName + " where json like '%\"name\":\"" + queryString.replace('"', '\\"') + "%' "
-        sqlStr += "and " + GetArmorJsonQueryFilter()
-        sqlStr += "limit " + str(rows*8-1)
+        #sqlStr += "and " + GetArmorJsonQueryFilter()
+        sqlStr += " limit " + str(rows*8-1)
 
         cur.execute(sqlStr)
         records = cur.fetchall()
