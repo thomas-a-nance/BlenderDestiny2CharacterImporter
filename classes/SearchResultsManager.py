@@ -112,8 +112,14 @@ class SearchResultsManager():
             self.SelectedSearchResultEntry = self.QueryResults.get(value)
             self.SelectedSearchResultEntry['customAttributes'] = {}
             self.SelectedSearchResultEntry.get('customAttributes')['categories'] = self.GetCategoryForSelected()
+            self.SelectedSearchResultEntry.get('customAttributes')['ornamentParent'] = ''
+            self.SelectedSearchResultEntry.get('customAttributes')['class'] = ''
+            
             if 'ornament' in self.SelectedSearchResultEntry.get('customAttributes').get('categories'):
                 self.SelectedSearchResultEntry.get('customAttributes')['ornamentParent'] = self.CheckForOrnamentParent()
+            className = self.CheckForClassCategory()
+            if len(className) > 0:
+                self.SelectedSearchResultEntry.get('customAttributes')['class'] = className
 
     def ClearEnumItem(self):
         self.SelectedSearchResultEntry = {}

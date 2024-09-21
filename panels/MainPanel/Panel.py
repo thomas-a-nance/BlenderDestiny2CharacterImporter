@@ -1,4 +1,5 @@
 import bpy
+import os
 from .Operators import *
 from ..MainPanel import Functions
     
@@ -34,6 +35,11 @@ class UI_PT_D2CI(bpy.types.Panel):  # class naming convention ‘CATEGORY_PT_nam
     def ShouldShowMainPanels(self, context):
         return len(bpy.types.WindowManager.d2ci_config.GetConfigItem('General','ManifestVersionNumber')) != 0 \
                     and bpy.types.WindowManager.d2ci_config.GetConfigItem('General','Destiny2PackageFileLocation') == context.D2PackageFilePath \
+                    and os.path.exists(bpy.types.WindowManager.d2ci_config.GetConfigItem('General','Destiny2PackageFileLocation')) \
+                    and len(bpy.types.WindowManager.d2ci_config.GetConfigItem('General','Destiny2PackageFileLocation')) > 0 \
+                    and bpy.types.WindowManager.d2ci_config.GetConfigItem('General','Destiny2OutputFileLocation') == context.D2OutputFilePath \
+                    and os.path.exists(bpy.types.WindowManager.d2ci_config.GetConfigItem('General','Destiny2OutputFileLocation')) \
+                    and len(bpy.types.WindowManager.d2ci_config.GetConfigItem('General','Destiny2OutputFileLocation')) > 0 \
                     and int(bpy.types.WindowManager.d2ci_config.GetConfigItem('General','APINumberOfSearchRows')) == context.D2SearchResultsRows
 
     def DrawAPISearch(self, context):
@@ -46,7 +52,7 @@ class UI_PT_D2CI(bpy.types.Panel):  # class naming convention ‘CATEGORY_PT_nam
 
         searchButton = row.column()
         searchButton.operator(UI_OT_D2CI_SearchAPI.bl_idname, text="", icon=UI_OT_D2CI_SearchAPI.bl_icon)
-        #searchButton.enabled = not ctx.IsSearchingAPI
+        searchButton.enabled = not ctx.IsSearchingAPI
         if len(ctx.SearchResultsText) > 0:
             row = self.layout.row()
             row.alignment = "RIGHT"
@@ -56,6 +62,7 @@ class UI_PT_D2CI(bpy.types.Panel):  # class naming convention ‘CATEGORY_PT_nam
 
         if ctx.IsSearchingAPI:
             ctx.SearchResultsEnum = 'None'
+            ctx.RippingExportText = ''
         
         nPanelWidth = context.region.width #280 Default
         searchResultWidth = 150
@@ -87,9 +94,9 @@ class UI_PT_D2CI(bpy.types.Panel):  # class naming convention ‘CATEGORY_PT_nam
             
             ornamentParent = bpy.types.WindowManager.d2ci_search_results_manager.SelectedSearchResultEntry.get('customAttributes').get('ornamentParent') or ''
             if len(ornamentParent) > 0:
-                col.label(text=bpy.types.WindowManager.d2ci_search_results_manager.SelectedSearchResultEntry.get('customAttributes').get('ornamentParent') + ' Ornament')
+                col.label(text=bpy.types.WindowManager.d2ci_search_results_manager.SelectedSearchResultEntry.get('customAttributes').get('ornamentParent'))
             else:
-                col.label(text=str(selectedEntry.get('itemTypeAndTierDisplayName')))
+                col.label(text=str(selectedEntry.get('itemTypeDisplayName')))
 
             row = self.layout.row()
             col.label(text=str(selectedEntry.get('hash')))
@@ -97,15 +104,37 @@ class UI_PT_D2CI(bpy.types.Panel):  # class naming convention ‘CATEGORY_PT_nam
             col = row.column()
             col.label()
 
+        if selectedEntry != {}:
+            self.layout.separator(factor=2, type="LINE")
+            exportModels = self.layout.row()
+            exportModels.operator(UI_OT_D2CI_RunRipperExport.bl_idname, text=UI_OT_D2CI_RunRipperExport.bl_label)
+            exportModels.enabled = not ctx.IsRippingExport
+
+            if len(ctx.RippingExportText) != 0:
+                row = self.layout.row()
+                row.alignment = "RIGHT"
+                row.label(text=ctx.RippingExportText)
+
+
+
     def DrawSettings(self, context):
         ctx = context.window_manager.d2ci
         
         # D2 Packages Folder
         row = self.layout.row(align=True)
         row.alignment = "CENTER"
-        row.label(text="D2 Package Folder")
+        row.label(text="D2 Package Directory")
         row = self.layout.row()
         row.prop(ctx, "D2PackageFilePath", text="")
+
+        self.layout.separator(factor=2, type="LINE")
+
+        # D2 Output Folder
+        row = self.layout.row(align=True)
+        row.alignment = "CENTER"
+        row.label(text="Output Directory")
+        row = self.layout.row()
+        row.prop(ctx, "D2OutputFilePath", text="")
 
         self.layout.separator(factor=2, type="LINE")
 

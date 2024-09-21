@@ -3,9 +3,17 @@ from ..MainPanel import Functions
 
 class UI_PG_D2CI_Props(bpy.types.PropertyGroup):
     D2PackageFilePath: bpy.props.StringProperty(
-        name="D2 Packages Folder",
-        description="Path to Destiny 2 packages folder",
+        name="D2 Packages Directory",
+        description="Directory to Destiny 2 packages folder",
         default=bpy.types.WindowManager.d2ci_config.GetConfigItem('General','Destiny2PackageFileLocation') or "",
+        maxlen=1024,
+        subtype='DIR_PATH'
+    )
+
+    D2OutputFilePath: bpy.props.StringProperty(
+        name="D2 Output Directory",
+        description="Directory to where to download models/data",
+        default=bpy.types.WindowManager.d2ci_config.GetConfigItem('General','Destiny2OutputFileLocation') or "",
         maxlen=1024,
         subtype='DIR_PATH'
     )
@@ -17,7 +25,7 @@ class UI_PG_D2CI_Props(bpy.types.PropertyGroup):
     )
 
     D2SearchResultsRows: bpy.props.IntProperty(
-        name="Rows Per Search (8 items)",
+        name="Rows Per Search",
         description="Number of rows returned for a search result (8 per row).",
         default=int(bpy.types.WindowManager.d2ci_config.GetConfigItem('General','APINumberOfSearchRows')),
         min=1
@@ -52,4 +60,18 @@ class UI_PG_D2CI_Props(bpy.types.PropertyGroup):
         description = 'D2CI Search Results Enum',
         items = Functions.GetSearchResultCollection,
         update=Functions.SelectSearchResult
+    )
+
+    RippingExportText: bpy.props.StringProperty(
+        name = 'RippingExportText',
+        description = 'Ripping/Export status',
+        default = "",
+        update=Functions.ForceRefreshUI
+    )
+
+    IsRippingExport: bpy.props.BoolProperty(
+        name = 'IsRippingExport',
+        description = 'Is performing D2CI Ripping/Export',
+        default = False,
+        update=Functions.ForceRefreshUI
     )

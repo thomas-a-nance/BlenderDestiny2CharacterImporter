@@ -1,5 +1,6 @@
 import bpy
-from ...methods import manifest, helpermethods, APISearchService
+import os
+from ...methods import manifest, APISearchService, RippingExportService
 
 def ForceRefreshUI(self, context):
     return None
@@ -10,13 +11,31 @@ def SearchAPI(self, context):
     APISearchService.GetAPISearchResultsByName(apiSearch, context)
     return {'FINISHED'}
 
+def RipAndExportModel(self, context):
+    RippingExportService.RipModelAndExport(context)
+    return {'FINISHED'}
+
 def SaveSettings(self, context):
+    #Validate D2 Package Path
     selectedDestiny2PackagesFolder = context.window_manager.d2ci.D2PackageFilePath
+    if not os.path.exists(selectedDestiny2PackagesFolder):
+        self.report({"ERROR_INVALID_INPUT"}, "D2 Package Directory is not a real path. Please select another directory.")
+        return {'CANCELLED'}
+    
     selectedPackagePathIsValid = manifest.ValidateDestiny2PackageFolderLocation(selectedDestiny2PackagesFolder)
     if not selectedPackagePathIsValid:
-        self.report({"ERROR_INVALID_INPUT"}, "Directory selected is invalid, please select the correct packages directory.")
+        self.report({"ERROR_INVALID_INPUT"}, "D2 Package Directory selected is invalid, please select the correct directory.")
         return {'CANCELLED'}
+    
+    #Validate Output Dir
+    selectedDestiny2OutputFolder = context.window_manager.d2ci.D2OutputFilePath
+    if not os.path.exists(selectedDestiny2OutputFolder):
+        self.report({"ERROR_INVALID_INPUT"}, "Output Directory is not a real path. Please select another directory.")
+        return {'CANCELLED'}
+    
+    #Save
     bpy.types.WindowManager.d2ci_config.SetConfigItem('General', 'Destiny2PackageFileLocation', selectedDestiny2PackagesFolder)
+    bpy.types.WindowManager.d2ci_config.SetConfigItem('General', 'Destiny2OutputFileLocation', selectedDestiny2OutputFolder)
 
     selectedNumberOfRows = context.window_manager.d2ci.D2SearchResultsRows
     bpy.types.WindowManager.d2ci_config.SetConfigItem('General', 'APINumberOfSearchRows', str(selectedNumberOfRows))

@@ -37,3 +37,6 @@ def GetProjectPath():
 
 def GetProjectImagePath():
     return os.path.join(GetProjectPath(), "Resources", "images")
+
+def GetProjectMDEPath():
+    return os.path.join(GetProjectPath(), "Resources", "MDE")

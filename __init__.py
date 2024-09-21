@@ -37,6 +37,7 @@ main_classes = (
     Operators.UI_OT_D2CI_Reinitialize,
     Operators.UI_OT_D2CI_SearchAPI,
     Operators.UI_OT_D2CI_ClearCache,
+    Operators.UI_OT_D2CI_RunRipperExport,
     PropertyGroup.UI_PG_D2CI_Props,
 )
 

@@ -10,6 +10,7 @@ class ConfigManager():
             "General": {
                 "ManifestVersionNumber": "",
                 "Destiny2PackageFileLocation": "",
+                "Destiny2OutputFileLocation": "",
                 "APINumberOfSearchRows": "4"
             }
         }'''
