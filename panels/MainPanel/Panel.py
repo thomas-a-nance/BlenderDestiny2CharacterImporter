@@ -35,7 +35,7 @@ class UI_PT_D2CI(bpy.types.Panel):  # class naming convention ‘CATEGORY_PT_nam
         ctx = context.window_manager.d2ci
         row = self.layout.row(align=True)
         row.alignment = "CENTER"
-        row.label(text="API Search")
+        row.label(text="Transmog Search")
         row = self.layout.row(align=True)
         row.prop(ctx, "D2APISearchBar", text="")
 
@@ -74,19 +74,20 @@ class UI_PT_D2CI(bpy.types.Panel):  # class naming convention ‘CATEGORY_PT_nam
             col = row.column()
             col.alignment = 'LEFT'
             col.label(text=selectedEntry.get('displayProperties').get('name'))
-            col.label()
-            col.label(text=str(selectedEntry.get('itemTypeDisplayName')))
-            if nPanelWidth < nPanelViewSplit:
-                row = self.layout.row()
-                col.label(text=selectedEntry.get('inventory').get('tierTypeName'))
-                col.label(text=str(selectedEntry.get('hash')))
+            row = col.row(align=True)
+            row.alignment = 'LEFT'
+            categories = bpy.types.WindowManager.d2ci_search_results_manager.SelectedSearchResultEntry.get('customAttributes').get('categories')
+            for cat in categories:
+                row.template_icon(icon_value = bpy.types.WindowManager.d2ci_icons.GetIconId(cat), scale=1.5)
+            
+            ornamentParent = bpy.types.WindowManager.d2ci_search_results_manager.SelectedSearchResultEntry.get('customAttributes').get('ornamentParent') or ''
+            if len(ornamentParent) > 0:
+                col.label(text=bpy.types.WindowManager.d2ci_search_results_manager.SelectedSearchResultEntry.get('customAttributes').get('ornamentParent') + ' Ornament')
             else:
-                row = self.layout.row()
-                row2 = col.split(factor=0.5)
-                row2.alignment = 'LEFT'
-                row2.label(text=selectedEntry.get('inventory').get('tierTypeName'))
-                row2.alignment = 'RIGHT'
-                row2.label(text=str(selectedEntry.get('hash')))
+                col.label(text=str(selectedEntry.get('itemTypeAndTierDisplayName')))
+
+            row = self.layout.row()
+            col.label(text=str(selectedEntry.get('hash')))
 
     def DrawSettings(self, context):
         ctx = context.window_manager.d2ci

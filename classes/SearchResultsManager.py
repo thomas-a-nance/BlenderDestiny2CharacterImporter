@@ -1,5 +1,6 @@
 import shutil
 import math
+import re
 from ..methods.helpermethods import *
 
 class SearchResultsManager():
@@ -25,7 +26,6 @@ class SearchResultsManager():
     def ClearCollectionAndFolder(self):
         self.ResultsCollection.clear()
         self.QueryResults = {}
-        self.SelectedSearchResultEntry = {}
         self.ClearEnumItem()
         shutil.rmtree(self.SearchResultsDirectory, ignore_errors=True)
         shutil.rmtree(self.TempResultDirectory, ignore_errors=True)
@@ -110,6 +110,73 @@ class SearchResultsManager():
     def SelectEnumItem(self, value):
         if value in self.QueryResults.keys():
             self.SelectedSearchResultEntry = self.QueryResults.get(value)
+            self.SelectedSearchResultEntry['customAttributes'] = {}
+            self.SelectedSearchResultEntry.get('customAttributes')['categories'] = self.GetCategoryForSelected()
+            if 'ornament' in self.SelectedSearchResultEntry.get('customAttributes').get('categories'):
+                self.SelectedSearchResultEntry.get('customAttributes')['ornamentParent'] = self.CheckForOrnamentParent()
 
     def ClearEnumItem(self):
         self.SelectedSearchResultEntry = {}
+
+    def GetCategoryForSelected(self):
+        categories = []
+        classCat = self.CheckForClassCategory()
+        if len(classCat) > 0:
+            categories.append(classCat)
+
+        match self.SelectedSearchResultEntry.get("itemSubType"):
+            case 20:
+                categories.append('shader')
+            case 21:
+                categories.append('ornament')
+                categories.append(self.CheckForOrnamentCategory())
+            case 26:
+                categories.append('head')
+            case 27:
+                categories.append('arms')
+            case 28:
+                categories.append('chest')
+            case 29:
+                categories.append('legs')
+            case 30:
+                categories.append('class')
+
+        return categories
+    
+    def CheckForClassCategory(self):
+        classType = self.SelectedSearchResultEntry.get("classType")
+        if classType == 0:
+            return "titan"
+        if classType == 1:
+            return "hunter"
+        if classType == 2:
+            return "warlock"
+        
+        #Fallback
+        try:
+            plugString = self.SelectedSearchResultEntry.get("plug").get('plugCategoryIdentifier')
+            if "warlock" in plugString:
+                return "warlock"
+            if "titan" in plugString:
+                return "titan"
+            if "hunter" in plugString:
+                return "hunter"
+        except:
+            return ''
+
+    def CheckForOrnamentCategory(self):
+        try:
+            plugString = self.SelectedSearchResultEntry.get("plug").get('plugCategoryIdentifier')
+            regexQuery = re.search("[a-zA-Z0-9_]*(warlock|titan|hunter)[a-zA-Z0-9_]*(head|arms|chest|legs|class)",plugString)
+            return regexQuery.group(2)
+        except:
+            return ''
+    
+    def CheckForOrnamentParent(self):
+        try:
+            desc = self.SelectedSearchResultEntry.get('displayProperties').get('description')
+            regexQuery = re.search('change the appearance of ([^\.]*)',desc)
+            return regexQuery.group(1)
+        except:
+            return ''
+    

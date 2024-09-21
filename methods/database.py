@@ -6,19 +6,23 @@ from ..methods import helpermethods
 databaseFileName = 'D2ItemInventory'
 tableListToLoad = ['DestinyInventoryItemDefinition']
 
-def QueryManifestByName(manifestName, queryString, rows=4):
-    if len(queryString) == 0:
-        return {}
-    
+def QueryManifestByName(manifestName, nameQueryString, includeOrnamentsForExotics=True, rows=4):
     con = sqlite3.connect(helpermethods.GetManifestLocalPath())
     con.create_function("REGEXP", 2, regexp)
     cur = con.cursor()
     try:
-        sqlStr = "SELECT * from " + manifestName + " where json like '%\"name\":\"" + queryString.replace('"', '\\"') + "%' "
-        #sqlStr += "and " + GetArmorJsonQueryFilter()
+        sqlStr = "SELECT * from " + manifestName + " where"
+        if includeOrnamentsForExotics:
+            sqlStr += " ("
+        sqlStr += " json REGEXP ?"
+        if includeOrnamentsForExotics:
+            sqlStr += " or json REGEXP ?"
+            sqlStr += " )"
+        sqlStr += " and " + GetArmorCategoryJsonQueryFilter()
         sqlStr += " limit " + str(rows*8-1)
 
-        cur.execute(sqlStr)
+        cur.execute(sqlStr, ['\"name\":\"[^\"]*' + nameQueryString + '[^\"]*\"', 'change the appearance of [^\.]*' + nameQueryString + '[^\.]*'])
+        
         records = cur.fetchall()
         recordsDict = {}
         for record in records:
@@ -31,12 +35,21 @@ def QueryManifestByName(manifestName, queryString, rows=4):
         con.close()
 
 def regexp(expr, item):
-    reg = re.compile(expr)
+    reg = re.compile(expr, re.IGNORECASE)
     return reg.search(item) is not None
 
-def GetArmorJsonQueryFilter(head=True, arms=True, chest=True, legs=True, classItem=True):
+def GetArmorCategoryJsonQueryFilter(warlock=True, titan=True, hunter=True, head=True, arms=True, chest=True, legs=True, classItem=True, shader=True):
+    armorClass = []
     armorSubtypes = []
     armorOrnamentsToGet = []
+    if warlock:
+        armorClass.append("warlock")
+    if titan:
+        armorClass.append("titan")
+    if hunter:
+        armorClass.append("hunter")
+    if shader:
+        armorSubtypes.append("20")
     if head:
         armorSubtypes.append("26")
         armorOrnamentsToGet.append('head')
@@ -54,20 +67,14 @@ def GetArmorJsonQueryFilter(head=True, arms=True, chest=True, legs=True, classIt
         armorOrnamentsToGet.append('class')
     
     armorOrnament = 21
+    classSlots = '|'.join(armorClass)
     armorSlots = '|'.join(armorSubtypes)
     armorOrnamentSlots = '|'.join(armorOrnamentsToGet)
-    armorOrnamentFullJson = "(\"itemSubType\":(" + armorSlots + "))|(\"plugCategoryIdentifier\":\"v\d+(_(warlock|titan|hunter)_(new_)?(" + armorOrnamentSlots + ")).*\"itemSubType\":" + str(armorOrnament) + ")"
-    queryString = "(json REGEXP '" + armorOrnamentFullJson + "')"
+    armorShaderFullJson = "\"itemSubType\":(" + armorSlots + ")"
+    armorOrnamentFullJson = "\"plugCategoryIdentifier\":\"[a-zA-Z0-9_]*(" + classSlots + ")[a-zA-Z0-9_]*(" + armorOrnamentSlots + ").*\"itemSubType\":" + str(armorOrnament)
+    queryString = "((json REGEXP '" + armorShaderFullJson + "') or (json REGEXP '" + armorOrnamentFullJson + "'))"
 
     return queryString
-
-def GetClassJsonQueryFilter():
-    classTypes = [
-        0, #Titan
-        1, #Hunter
-        2, #Warlock
-        #3 is unknown
-    ]
 
 def ConvertDatabaseIdToHash(dbId):
     hash = int(dbId)
