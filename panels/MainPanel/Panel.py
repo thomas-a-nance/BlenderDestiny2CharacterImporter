@@ -27,11 +27,12 @@ class UI_PT_D2CI(bpy.types.Panel):  # class naming convention ‘CATEGORY_PT_nam
         
         match ctx.MainPanelEnum:
             case "BAG":
-                self.DrawAPISearch(ctx)
+                self.DrawAPISearch(context)
             case _:
-                self.DrawSettings(ctx)
+                self.DrawSettings(context)
     
-    def DrawAPISearch(self, ctx):
+    def DrawAPISearch(self, context):
+        ctx = context.window_manager.d2ci
         row = self.layout.row(align=True)
         row.alignment = "CENTER"
         row.label(text="API Search")
@@ -48,18 +49,35 @@ class UI_PT_D2CI(bpy.types.Panel):  # class naming convention ‘CATEGORY_PT_nam
 
         self.layout.separator(factor=2, type="LINE")
 
-        if not ctx.IsSearchingAPI:
+        if ctx.IsSearchingAPI:
             ctx.SearchResultsEnum = 'None'
         
-        row = self.layout.row()
-        row.template_icon_view(ctx, 
+        nPanelWidth = context.region.width #280 Default
+        searchResultWidth = 130
+        
+        if nPanelWidth < 350:
+            row = self.layout.row()
+        else:
+            row = self.layout.split(factor= (searchResultWidth / nPanelWidth))
+            
+        col = row.column()
+        col.template_icon_view(ctx, 
             "SearchResultsEnum",
             show_labels=True,
             scale=5,
             scale_popup=5
         )
 
-    def DrawSettings(self, ctx):
+        if nPanelWidth < 350:
+            row = self.layout.row()
+
+        col = row.column()
+        col.alignment = 'LEFT'
+        col.label(text='Item Name')
+        col.label(text='Item ID')
+
+    def DrawSettings(self, context):
+        ctx = context.window_manager.d2ci
         row = self.layout.row(align=True)
         row.alignment = "CENTER"
         row.label(text="D2 Package Folder")

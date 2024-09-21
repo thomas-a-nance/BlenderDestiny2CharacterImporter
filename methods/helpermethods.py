@@ -23,6 +23,9 @@ def GetProjectSearchResultsImagePath():
 def GetProjectTempImagePath():
     return os.path.join(GetProjectLocalPath(), "TempImages")
 
+def GetProjectCacheImagePath():
+    return os.path.join(GetProjectLocalPath(), "Cache")
+
 def GetProjectResourcesPath():
     return os.path.join(GetProjectLocalPath(), "Resources")
 

@@ -6,6 +6,7 @@ class SearchResultsManager():
     QueryResults = {}
     SearchResultsDirectory = GetProjectSearchResultsImagePath()
     TempResultDirectory = GetProjectTempImagePath()
+    CacheResultDirectory = GetProjectCacheImagePath()
     ProjectImageDirectory = GetProjectImagePath()
     SelectedSearchResultEntry = {}
 
@@ -17,6 +18,7 @@ class SearchResultsManager():
 
     def SetQueryResultsFromSearch(self, results):
         self.QueryResults = results
+        self.CopyFilesFromTempToCacheResults()
         self.MoveFilesFromTempToSearchResults()
 
     def ClearCollectionAndFolder(self):
@@ -27,6 +29,23 @@ class SearchResultsManager():
         shutil.rmtree(self.TempResultDirectory, ignore_errors=True)
         os.makedirs(self.SearchResultsDirectory, mode=0o777, exist_ok=True)
         os.makedirs(self.TempResultDirectory, mode=0o777, exist_ok=True)
+        os.makedirs(self.CacheResultDirectory, mode=0o777, exist_ok=True)
+
+    def ExistsInCache(self, fileName, extension = ".jpg"):
+        return os.path.exists(os.path.join(self.CacheResultDirectory, fileName + extension))
+
+    def CopyFileFromCacheToTempResults(self, file, extension = ".jpg"):
+        if self.ExistsInCache(file, extension):
+            src_path = os.path.join(self.CacheResultDirectory, file + extension)
+            dst_path = os.path.join(self.TempResultDirectory, file + extension)
+            shutil.copy(src_path, dst_path)
+
+    def CopyFilesFromTempToCacheResults(self):
+        allfiles = os.listdir(self.TempResultDirectory)
+        for f in allfiles:
+            src_path = os.path.join(self.TempResultDirectory, f)
+            dst_path = os.path.join(self.CacheResultDirectory, f)
+            shutil.copy(src_path, dst_path)
 
     def MoveFilesFromTempToSearchResults(self):
         allfiles = os.listdir(self.TempResultDirectory)
