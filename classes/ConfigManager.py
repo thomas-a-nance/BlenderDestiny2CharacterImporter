@@ -9,7 +9,8 @@ class ConfigManager():
     configOptions = '''{
             "General": {
                 "ManifestVersionNumber": "",
-                "Destiny2PackageFileLocation": ""
+                "Destiny2PackageFileLocation": "",
+                "APINumberOfSearchRows": "4"
             }
         }'''
     

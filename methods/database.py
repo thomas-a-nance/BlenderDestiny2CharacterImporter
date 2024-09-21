@@ -6,7 +6,7 @@ from ..methods import helpermethods
 databaseFileName = 'D2ItemInventory'
 tableListToLoad = ['DestinyInventoryItemDefinition']
 
-def QueryManifestByName(manifestName, nameQueryString, includeOrnamentsForExotics=True, rows=4):
+def QueryManifestByName(manifestName, nameQueryString, rows=4, includeOrnamentsForExotics=True):
     con = sqlite3.connect(helpermethods.GetManifestLocalPath())
     con.create_function("REGEXP", 2, regexp)
     cur = con.cursor()

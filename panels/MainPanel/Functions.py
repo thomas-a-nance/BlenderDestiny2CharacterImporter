@@ -17,6 +17,10 @@ def SaveSettings(self, context):
         self.report({"ERROR_INVALID_INPUT"}, "Directory selected is invalid, please select the correct packages directory.")
         return {'CANCELLED'}
     bpy.types.WindowManager.d2ci_config.SetConfigItem('General', 'Destiny2PackageFileLocation', selectedDestiny2PackagesFolder)
+
+    selectedNumberOfRows = context.window_manager.d2ci.D2SearchResultsRows
+    bpy.types.WindowManager.d2ci_config.SetConfigItem('General', 'APINumberOfSearchRows', str(selectedNumberOfRows))
+
     bpy.types.WindowManager.d2ci_config.IsPopulatingManifestConfig = True
     manifest.LoadD2Database()
     return {'FINISHED'}

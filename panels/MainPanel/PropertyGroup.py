@@ -16,6 +16,13 @@ class UI_PG_D2CI_Props(bpy.types.PropertyGroup):
         default="",
     )
 
+    D2SearchResultsRows: bpy.props.IntProperty(
+        name="Rows Per Search (8 items)",
+        description="Number of rows returned for a search result (8 per row).",
+        default=int(bpy.types.WindowManager.d2ci_config.GetConfigItem('General','APINumberOfSearchRows')),
+        min=1
+    )
+
     MainPanelEnum: bpy.props.EnumProperty(
         name = 'Main Panel',
         description = 'D2CI Main Panel',

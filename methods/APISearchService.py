@@ -12,7 +12,8 @@ def GetAPISearchResultsByName(searchText, context):
     try:
         context.window_manager.d2ci.IsSearchingAPI = True
         context.window_manager.d2ci.SearchResultsText = "Searching Database..."
-        queryResults = database.QueryManifestByName('DestinyInventoryItemDefinition', searchText)
+        numOfRows = int(context.window_manager.d2ci.D2SearchResultsRows)
+        queryResults = database.QueryManifestByName('DestinyInventoryItemDefinition', searchText, rows=numOfRows)
         numOfFoundResults = str(len(queryResults.keys()))
         global searchResultImageCount
         searchResultImageCount = 0

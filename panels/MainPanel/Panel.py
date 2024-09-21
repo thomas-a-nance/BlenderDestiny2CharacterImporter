@@ -20,7 +20,7 @@ class UI_PT_D2CI(bpy.types.Panel):  # class naming convention ‘CATEGORY_PT_nam
         row.scale_x = 2
         row.scale_y = 1.25
         
-        if len(bpy.types.WindowManager.d2ci_config.GetConfigItem('General','ManifestVersionNumber')) != 0:
+        if self.ShouldShowMainPanels(ctx) :
             row.prop(Functions.MainPanelMenu(ctx), 'MainPanelEnum', expand=True, icon_only=True)
         else:
             ctx.MainPanelEnum = "SETTINGS"
@@ -31,6 +31,11 @@ class UI_PT_D2CI(bpy.types.Panel):  # class naming convention ‘CATEGORY_PT_nam
             case _:
                 self.DrawSettings(context)
     
+    def ShouldShowMainPanels(self, context):
+        return len(bpy.types.WindowManager.d2ci_config.GetConfigItem('General','ManifestVersionNumber')) != 0 \
+                    and bpy.types.WindowManager.d2ci_config.GetConfigItem('General','Destiny2PackageFileLocation') == context.D2PackageFilePath \
+                    and int(bpy.types.WindowManager.d2ci_config.GetConfigItem('General','APINumberOfSearchRows')) == context.D2SearchResultsRows
+
     def DrawAPISearch(self, context):
         ctx = context.window_manager.d2ci
         row = self.layout.row(align=True)
@@ -57,7 +62,7 @@ class UI_PT_D2CI(bpy.types.Panel):  # class naming convention ‘CATEGORY_PT_nam
         nPanelViewSplit = 350
 
         if nPanelWidth < nPanelViewSplit:
-            row = self.layout.row()
+            row = self.layout.split(factor = (searchResultWidth / nPanelWidth))
         else:
             row = self.layout.split(factor = (searchResultWidth / nPanelWidth))
             
@@ -88,9 +93,14 @@ class UI_PT_D2CI(bpy.types.Panel):  # class naming convention ‘CATEGORY_PT_nam
 
             row = self.layout.row()
             col.label(text=str(selectedEntry.get('hash')))
+        elif nPanelWidth < nPanelViewSplit:
+            col = row.column()
+            col.label()
 
     def DrawSettings(self, context):
         ctx = context.window_manager.d2ci
+        
+        # D2 Packages Folder
         row = self.layout.row(align=True)
         row.alignment = "CENTER"
         row.label(text="D2 Package Folder")
@@ -99,6 +109,14 @@ class UI_PT_D2CI(bpy.types.Panel):  # class naming convention ‘CATEGORY_PT_nam
 
         self.layout.separator(factor=2, type="LINE")
 
+        # Number of rows from search results
+        row = self.layout.row(align=True)
+        refreshButton = row.column()
+        refreshButton.prop(ctx, "D2SearchResultsRows")
+
+        self.layout.separator(factor=2, type="LINE")
+
+        # Cache
         row = self.layout.row(align=True)
         saveSettings = row.column()
         saveSettings.label(text="Cache Size: " + str(bpy.types.WindowManager.d2ci_search_results_manager.GetCacheSize()))
@@ -108,6 +126,7 @@ class UI_PT_D2CI(bpy.types.Panel):  # class naming convention ‘CATEGORY_PT_nam
 
         self.layout.separator(factor=2, type="LINE")
 
+        # Save Settings
         row = self.layout.row(align=True)
         saveSettings = row.column()
         saveSettings.operator(UI_OT_D2CI_SaveSettings.bl_idname, text=UI_OT_D2CI_SaveSettings.bl_label)
