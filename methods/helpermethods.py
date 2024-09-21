@@ -8,9 +8,16 @@ ProjectLocalStorageFolderName = "BlenderD2CI"
 ItemDefinitionLocalStorageFolderName = "Destiny2ItemDefinition"
 DownloadInProgressIndicatorFileName = "download_in_progress"
     
+def getAsyncioLoop():
+    try:
+        return asyncio.get_event_loop()
+    except RuntimeError:
+        asyncio.new_event_loop()
+        return asyncio.get_event_loop()
+
 def background(f):
     def wrapped(*args, **kwargs):
-        return asyncio.get_event_loop().run_in_executor(None, f, *args, **kwargs)
+        return getAsyncioLoop().run_in_executor(None, f, *args, **kwargs)
 
     return wrapped
 

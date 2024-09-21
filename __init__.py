@@ -56,3 +56,4 @@ def unregister():
 
     del bpy.types.WindowManager.d2ci
     bpy.types.WindowManager.d2ci_search_results_manager.ClearCollectionAndFolder()
+    helpermethods.getAsyncioLoop().close()

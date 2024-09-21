@@ -1,6 +1,6 @@
 import bpy
-import os
 import re
+import os
 import subprocess
 from ..methods import helpermethods
 import traceback
@@ -32,28 +32,28 @@ def RipModelAndExport(context):
 
 def RunMDE(item):
     configMgr = bpy.types.WindowManager.d2ci_config
-    packagesFolder = replaceBackslashes(wrapFilePathInQuotes(configMgr.GetConfigItem('General','Destiny2PackageFileLocation')))
-    outputFolder = replaceBackslashes(wrapFilePathInQuotes(configMgr.GetConfigItem('General','Destiny2OutputFileLocation')))
-    mdeFilePath = wrapFilePathInQuotes(helpermethods.GetProjectMDEPath())
-    mdeArgs = ['--pkgspath', packagesFolder, '--outputpath', outputFolder]
+    packagesFolder = FixFilePathForArgs(configMgr.GetConfigItem('General','Destiny2PackageFileLocation'))
+    mdeFilePath = FixFilePathForArgs(helpermethods.GetProjectMDEPath())
+    outputFolder = configMgr.GetConfigItem('General','Destiny2OutputFileLocation')
 
+    fileName = re.sub('[ -\"\']', '_', (item.get('class')+'_' if len(item.get('class')) > 0 else '') + item.get('name').lower())
+    foldersuffix = str(len([i for i in os.listdir(outputFolder) if os.path.isdir(i)]))
+    os.makedirs(os.path.join(outputFolder, fileName+'_'+foldersuffix), mode=0o777, exist_ok=True)
+    finalOutputFolder = FixFilePathForArgs(os.path.join(outputFolder, fileName+'_'+foldersuffix))
+
+    mdeArgs = ['--pkgspath', r'"%s"' % packagesFolder, '--outputpath', r'"%s"' % finalOutputFolder]
     if not item.get('shader'):
-        mdeArgs = mdeArgs + ['--filename', re.sub('[ -\"\']', '_', (item.get('class')+'_' if len(item.get('class')) > 0 else '') + item.get('name').lower())]
-
+        mdeArgs = mdeArgs + ['--filename', fileName]
     mdeArgs = mdeArgs + ['--textures', ('--shader' if item.get('shader') else '--api'), str(item.get('hash'))]
-
     cmdArgs = ' '.join(mdeArgs)
-    cmd = 'MontevenDynamicExtractorv1.9.3.exe'
-    fullCmdWithArgs = cmd + ' ' + cmdArgs
-    os.chdir(mdeFilePath)
-    subprocess.check_call([fullCmdWithArgs])
+
+    exitCode = subprocess.Popen("MontevenDynamicExtractorv1.9.3.exe" + " " + cmdArgs, shell=False, cwd=mdeFilePath).wait()
+    if exitCode != 0:
+        raise Exception("MDE Failed")
     return
 
-def replaceBackslashes(path):
-    return path.replace('\\', '/')
-
-def wrapFilePathInQuotes(path):
-    return '"' + path + '"'
+def FixFilePathForArgs(path):
+    return path.replace("\\","/")
 
 #hash: item.id,
 #name: item.getAttribute('name'),
