@@ -1,6 +1,4 @@
 import bpy
-import asyncio
-from .methods import helpermethods
 from .classes.SearchResultsManager import SearchResultsManager
 from .classes.ConfigManager import ConfigManager
 from .classes.CustomIconManager import CustomIconManager
@@ -15,8 +13,6 @@ bl_info = {
     "warning" : "",
     "category" : "Generic"
 }
-
-asyncio.set_event_loop(asyncio.new_event_loop())
 
 # ------------------------------------------------------------------------
 #    Registration
@@ -56,4 +52,3 @@ def unregister():
 
     del bpy.types.WindowManager.d2ci
     bpy.types.WindowManager.d2ci_search_results_manager.ClearCollectionAndFolder()
-    helpermethods.getAsyncioLoop().close()
