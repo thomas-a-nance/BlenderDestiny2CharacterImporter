@@ -1,5 +1,4 @@
 import bpy
-import os
 from .Operators import *
 from ..MainPanel import Functions
     
