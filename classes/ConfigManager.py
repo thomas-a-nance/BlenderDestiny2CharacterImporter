@@ -6,6 +6,7 @@ from ..methods.helpermethods import *
 class ConfigManager():
     config = configparser.ConfigParser()
     configFileName = os.path.join(GetProjectLocalPath(), "config.ini")
+    HasModifiedConfig = False
     configOptions = '''{
             "General": {
                 "ManifestVersionNumber": "",
@@ -56,7 +57,7 @@ class ConfigManager():
         self.UpdateConfigFile()
         return True
     
-    def GetMainPanelDefaultTab(self, context) -> int:
+    def GetMainPanelDefaultTab(self) -> int:
         if self.ShouldShowAllMainPanelTabs():
             return 0
         else:
@@ -76,6 +77,4 @@ class ConfigManager():
             and len(self.GetConfigItem('General','Destiny2PackageFileLocation')) > 0 \
             and os.path.exists(self.GetConfigItem('General','Destiny2OutputFileLocation')) \
             and len(self.GetConfigItem('General','Destiny2OutputFileLocation')) > 0 \
-            #and bpy.types.WindowManager.d2ci_config.GetConfigItem('General','Destiny2OutputFileLocation') == context.D2OutputFilePath \
-            #and bpy.types.WindowManager.d2ci_config.GetConfigItem('General','Destiny2PackageFileLocation') == context.D2PackageFilePath \
-            #and int(bpy.types.WindowManager.d2ci_config.GetConfigItem('General','APINumberOfSearchRows')) == context.D2SearchResultsRows
+            and not bpy.types.WindowManager.d2ci_config.HasModifiedConfig

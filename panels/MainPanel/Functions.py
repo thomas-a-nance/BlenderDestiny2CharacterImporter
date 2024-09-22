@@ -48,6 +48,10 @@ def MainPanelMenu(context):
     option = context
     return option
 
+def ForceSaveDueToConfigChange(self, context):
+    context.window_manager.d2ci.HasModifiedConfig = True
+    bpy.types.WindowManager.d2ci_config.HasModifiedConfig = True
+
 def GetMainPanelTabs(self, context):
     return bpy.types.WindowManager.d2ci_config.GetMainPanelTabsAsEnum()
 

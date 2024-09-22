@@ -7,7 +7,8 @@ class UI_PG_D2CI_Props(bpy.types.PropertyGroup):
         description="Directory to Destiny 2 packages folder",
         default=bpy.types.WindowManager.d2ci_config.GetConfigItem('General','Destiny2PackageFileLocation') or "",
         maxlen=1024,
-        subtype='DIR_PATH'
+        subtype='DIR_PATH',
+        update=Functions.ForceSaveDueToConfigChange
     )
 
     D2OutputFilePath: bpy.props.StringProperty(
@@ -15,7 +16,8 @@ class UI_PG_D2CI_Props(bpy.types.PropertyGroup):
         description="Directory to where to download models/data",
         default=bpy.types.WindowManager.d2ci_config.GetConfigItem('General','Destiny2OutputFileLocation') or "",
         maxlen=1024,
-        subtype='DIR_PATH'
+        subtype='DIR_PATH',
+        update=Functions.ForceSaveDueToConfigChange
     )
 
     D2SaveSettingsIsEnabled: bpy.props.BoolProperty(
@@ -35,7 +37,15 @@ class UI_PG_D2CI_Props(bpy.types.PropertyGroup):
         name="Rows Per Search",
         description="Number of rows returned for a search result (8 per row).",
         default=int(bpy.types.WindowManager.d2ci_config.GetConfigItem('General','APINumberOfSearchRows')),
-        min=1
+        min=1,
+        update=Functions.ForceSaveDueToConfigChange
+    )
+
+    HasModifiedConfig: bpy.props.BoolProperty(
+        name = 'HasModifiedConfig',
+        description = 'Has the config been modified?',
+        default = False,
+        update=Functions.ForceRefreshUI
     )
 
     MainPanelEnum: bpy.props.EnumProperty(
@@ -63,7 +73,7 @@ class UI_PG_D2CI_Props(bpy.types.PropertyGroup):
         name = 'SearchResults',
         description = 'D2CI Search Results Enum',
         items = Functions.GetSearchResultCollection,
-        update=Functions.SelectSearchResult
+        update = Functions.SelectSearchResult
     )
 
     RippingExportText: bpy.props.StringProperty(

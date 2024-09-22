@@ -27,7 +27,9 @@ def LoadD2Database(context):
         DownloadManifestContent(d2ItemDefinitionURL, folderPath)
  
     bpy.types.WindowManager.d2ci_config.SetConfigItem('General', 'ManifestVersionNumber', d2ManifestVersion)
+    bpy.types.WindowManager.d2ci_config.HasModifiedConfig = False
     context.window_manager.d2ci.D2SaveSettingsIsEnabled = True
+    context.window_manager.d2ci.HasModifiedConfig = False
 
 def GetDestiny2ManifestFromAPI():
     apiUrl = baseUrl + manifestUrl
