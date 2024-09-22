@@ -14,8 +14,6 @@ class ConfigManager():
                 "APINumberOfSearchRows": "4"
             }
         }'''
-    
-    IsPopulatingManifestConfig = False
 
     def __del__(self):
         self.config = None
@@ -57,3 +55,27 @@ class ConfigManager():
         categoryList[key] = value
         self.UpdateConfigFile()
         return True
+    
+    def GetMainPanelDefaultTab(self, context) -> int:
+        if self.ShouldShowAllMainPanelTabs():
+            return 0
+        else:
+            return 1
+    
+    def GetMainPanelTabsAsEnum(self):
+        mainPanels = []
+        if self.ShouldShowAllMainPanelTabs():
+            mainPanels.append(('BAG', 'Build-A-Guardian', 'Build a guardian from Destiny 2 to import into the scene', bpy.types.WindowManager.d2ci_icons.GetIconId("bag"), 0))
+
+        mainPanels.append(('SETTINGS', 'Settings', 'Modify settings for D2CI', bpy.types.WindowManager.d2ci_icons.GetIconId("settings"), 1))
+        return mainPanels
+    
+    def ShouldShowAllMainPanelTabs(self):
+        return len(self.GetConfigItem('General','ManifestVersionNumber')) != 0 \
+            and os.path.exists(self.GetConfigItem('General','Destiny2PackageFileLocation')) \
+            and len(self.GetConfigItem('General','Destiny2PackageFileLocation')) > 0 \
+            and os.path.exists(self.GetConfigItem('General','Destiny2OutputFileLocation')) \
+            and len(self.GetConfigItem('General','Destiny2OutputFileLocation')) > 0 \
+            #and bpy.types.WindowManager.d2ci_config.GetConfigItem('General','Destiny2OutputFileLocation') == context.D2OutputFilePath \
+            #and bpy.types.WindowManager.d2ci_config.GetConfigItem('General','Destiny2PackageFileLocation') == context.D2PackageFilePath \
+            #and int(bpy.types.WindowManager.d2ci_config.GetConfigItem('General','APINumberOfSearchRows')) == context.D2SearchResultsRows

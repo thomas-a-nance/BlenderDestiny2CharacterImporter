@@ -17,22 +17,17 @@ def ValidateDestiny2PackageFolderLocation(folderPath):
     return True
 
 @helpermethods.background
-def LoadD2Database():
+def LoadD2Database(context):
     d2ManifestQuery = GetDestiny2ManifestFromAPI()
     d2Manifest = d2ManifestQuery.json()
     d2ManifestVersion = d2Manifest["Response"]["version"]
     d2ItemDefinitionURL = baseUrl + d2Manifest["Response"]["mobileWorldContentPaths"]["en"]
     folderPath = helpermethods.GetProjectResourcesPath()
-    manifestPickle = helpermethods.GetManifestLocalPath()
-    if os.path.exists(os.path.join(folderPath, helpermethods.DownloadInProgressIndicatorFileName)) or not os.path.exists(manifestPickle) or bpy.types.WindowManager.d2ci_config.GetConfigItem('General','ManifestVersionNumber') != d2ManifestVersion:
+    if bpy.types.WindowManager.d2ci_config.GetConfigItem('General','ManifestVersionNumber') != d2ManifestVersion:
         DownloadManifestContent(d2ItemDefinitionURL, folderPath)
-
-    elif bpy.types.WindowManager.d2ci_config.GetConfigItem('General','ManifestVersionNumber') == d2ManifestVersion:
-        if not os.path.exists(manifestPickle):
-            DownloadManifestContent(d2ItemDefinitionURL, folderPath)
  
     bpy.types.WindowManager.d2ci_config.SetConfigItem('General', 'ManifestVersionNumber', d2ManifestVersion)
-    bpy.types.WindowManager.d2ci_config.IsPopulatingManifestConfig = False
+    context.window_manager.d2ci.D2SaveSettingsIsEnabled = True
 
 def GetDestiny2ManifestFromAPI():
     apiUrl = baseUrl + manifestUrl
@@ -41,10 +36,8 @@ def GetDestiny2ManifestFromAPI():
     return returnData
 
 def DownloadManifestContent(d2ItemDefinitionURL, folderPath):
-    downloadIndicator = os.path.join(folderPath, helpermethods.DownloadInProgressIndicatorFileName)
     shutil.rmtree(folderPath, ignore_errors=True)
     os.makedirs(folderPath, mode=0o777, exist_ok=True)
-    open(downloadIndicator, 'a').close()
 
     tmpFileLocation = os.path.join(folderPath, "MANZIP")
     manifestLocation = helpermethods.GetManifestLocalPath()
@@ -60,5 +53,4 @@ def DownloadManifestContent(d2ItemDefinitionURL, folderPath):
 
     print("Database Built")
     os.remove(tmpFileLocation)
-    os.remove(downloadIndicator)
     return

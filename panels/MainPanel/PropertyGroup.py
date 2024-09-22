@@ -18,6 +18,13 @@ class UI_PG_D2CI_Props(bpy.types.PropertyGroup):
         subtype='DIR_PATH'
     )
 
+    D2SaveSettingsIsEnabled: bpy.props.BoolProperty(
+        name = 'D2SaveSettingsIsEnabled',
+        description = 'Should the Save Settings button be enabled?',
+        default = True,
+        update=Functions.ForceRefreshUI
+    )
+
     D2APISearchBar: bpy.props.StringProperty(
         name="API Search",
         description="Search the D2 API for an item",
@@ -34,11 +41,8 @@ class UI_PG_D2CI_Props(bpy.types.PropertyGroup):
     MainPanelEnum: bpy.props.EnumProperty(
         name = 'Main Panel',
         description = 'D2CI Main Panel',
-        items = [
-            ('BAG', 'Build-A-Guardian', 'Build a guardian from Destiny 2 to import into the scene', bpy.types.WindowManager.d2ci_icons.GetIconId("bag"), 0),
-            ('SETTINGS', 'Settings', 'Modify settings for D2CI', bpy.types.WindowManager.d2ci_icons.GetIconId("settings"), 1)
-        ],
-        default = 'BAG'
+        items = Functions.GetMainPanelTabs,
+        default = (0 if bpy.types.WindowManager.d2ci_config.ShouldShowAllMainPanelTabs() else len(bpy.types.WindowManager.d2ci_config.GetMainPanelTabsAsEnum()))
     )
 
     SearchResultsText: bpy.props.StringProperty(

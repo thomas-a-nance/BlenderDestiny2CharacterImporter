@@ -5,7 +5,7 @@ class UI_OT_D2CI_SearchAPI(bpy.types.Operator):
     bl_idname = "ui.d2ci_searchapi"
     bl_label = "Search API"
     bl_icon = "VIEWZOOM"
-    bl_description = "Search the D2 API for an item."
+    bl_description = "Search the D2 API for an item"
 
     def execute(self, context):
         return Functions.SearchAPI(self, context)
@@ -14,7 +14,7 @@ class UI_OT_D2CI_ClearCache(bpy.types.Operator):
     bl_idname = "ui.d2ci_clearcache"
     bl_label = "Clear Cache"
     bl_icon = "BRUSH_DATA"
-    bl_description = "Clears the cache of images from query searches."
+    bl_description = "Clears the cache of images from query searches"
     
     def execute(self, context):
         bpy.types.WindowManager.d2ci_search_results_manager.ClearCache()
@@ -24,7 +24,7 @@ class UI_OT_D2CI_Reinitialize(bpy.types.Operator):
     bl_idname = "ui.d2ci_reinitialize"
     bl_label = "Reinitialize"
     bl_icon = "TRASH"
-    bl_description = "Clears the version number, forcing the manifest to be redownloaded on save."
+    bl_description = "Clears the version number, forcing the manifest to be redownloaded on save"
     
     def execute(self, context):
         bpy.types.WindowManager.d2ci_config.SetConfigItem('General','ManifestVersionNumber','')
@@ -33,7 +33,7 @@ class UI_OT_D2CI_Reinitialize(bpy.types.Operator):
 class UI_OT_D2CI_SaveSettings(bpy.types.Operator):
     bl_idname = "ui.d2ci_save_settings"
     bl_label = "Save Settings"
-    bl_description = "Downloads the manifest to query data."
+    bl_description = "Downloads the manifest to query data"
 
     def execute(self, context):
         return Functions.SaveSettings(self, context)
@@ -41,7 +41,7 @@ class UI_OT_D2CI_SaveSettings(bpy.types.Operator):
 class UI_OT_D2CI_RunRipperExport(bpy.types.Operator):
     bl_idname = "ui.d2ci_run_ripper_export"
     bl_label = "Start Ripping"
-    bl_description = "Rip model(s) and export."
+    bl_description = "Rip model(s) and export"
 
     def execute(self, context):
         return Functions.RipAndExportModel(self, context)

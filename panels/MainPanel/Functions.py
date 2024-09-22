@@ -34,19 +34,22 @@ def SaveSettings(self, context):
         return {'CANCELLED'}
     
     #Save
+    context.window_manager.d2ci.D2SaveSettingsIsEnabled = False
     bpy.types.WindowManager.d2ci_config.SetConfigItem('General', 'Destiny2PackageFileLocation', selectedDestiny2PackagesFolder)
     bpy.types.WindowManager.d2ci_config.SetConfigItem('General', 'Destiny2OutputFileLocation', selectedDestiny2OutputFolder)
 
     selectedNumberOfRows = context.window_manager.d2ci.D2SearchResultsRows
     bpy.types.WindowManager.d2ci_config.SetConfigItem('General', 'APINumberOfSearchRows', str(selectedNumberOfRows))
 
-    bpy.types.WindowManager.d2ci_config.IsPopulatingManifestConfig = True
-    manifest.LoadD2Database()
+    manifest.LoadD2Database(context)
     return {'FINISHED'}
 
 def MainPanelMenu(context):
     option = context
     return option
+
+def GetMainPanelTabs(self, context):
+    return bpy.types.WindowManager.d2ci_config.GetMainPanelTabsAsEnum()
 
 def GetSearchResultCollection(self, context):
     return bpy.types.WindowManager.d2ci_search_results_manager.GetCollectionAsEnum()

@@ -21,26 +21,12 @@ class UI_PT_D2CI(bpy.types.Panel):  # class naming convention ‘CATEGORY_PT_nam
         row.scale_x = 2
         row.scale_y = 1.25
         
-        if self.ShouldShowMainPanels(ctx) :
-            row.prop(Functions.MainPanelMenu(ctx), 'MainPanelEnum', expand=True, icon_only=True)
-        else:
-            ctx.MainPanelEnum = "SETTINGS"
-        
+        row.prop(Functions.MainPanelMenu(ctx), 'MainPanelEnum', expand=True, icon_only=True)
         match ctx.MainPanelEnum:
             case "BAG":
                 self.DrawAPISearch(context)
             case _:
                 self.DrawSettings(context)
-    
-    def ShouldShowMainPanels(self, context):
-        return len(bpy.types.WindowManager.d2ci_config.GetConfigItem('General','ManifestVersionNumber')) != 0 \
-                    and bpy.types.WindowManager.d2ci_config.GetConfigItem('General','Destiny2PackageFileLocation') == context.D2PackageFilePath \
-                    and os.path.exists(bpy.types.WindowManager.d2ci_config.GetConfigItem('General','Destiny2PackageFileLocation')) \
-                    and len(bpy.types.WindowManager.d2ci_config.GetConfigItem('General','Destiny2PackageFileLocation')) > 0 \
-                    and bpy.types.WindowManager.d2ci_config.GetConfigItem('General','Destiny2OutputFileLocation') == context.D2OutputFilePath \
-                    and os.path.exists(bpy.types.WindowManager.d2ci_config.GetConfigItem('General','Destiny2OutputFileLocation')) \
-                    and len(bpy.types.WindowManager.d2ci_config.GetConfigItem('General','Destiny2OutputFileLocation')) > 0 \
-                    and int(bpy.types.WindowManager.d2ci_config.GetConfigItem('General','APINumberOfSearchRows')) == context.D2SearchResultsRows
 
     def DrawAPISearch(self, context):
         ctx = context.window_manager.d2ci
@@ -155,7 +141,7 @@ class UI_PT_D2CI(bpy.types.Panel):  # class naming convention ‘CATEGORY_PT_nam
         row = self.layout.row(align=True)
         saveSettings = row.column()
         saveSettings.operator(UI_OT_D2CI_SaveSettings.bl_idname, text=UI_OT_D2CI_SaveSettings.bl_label)
-        saveSettings.enabled = not bpy.types.WindowManager.d2ci_config.IsPopulatingManifestConfig
+        saveSettings.enabled = ctx.D2SaveSettingsIsEnabled
 
         refreshButton = row.column()
         refreshButton.operator(UI_OT_D2CI_Reinitialize.bl_idname, text="", icon=UI_OT_D2CI_Reinitialize.bl_icon)

@@ -6,7 +6,6 @@ from pathlib import Path
 
 ProjectLocalStorageFolderName = "BlenderD2CI"
 ItemDefinitionLocalStorageFolderName = "Destiny2ItemDefinition"
-DownloadInProgressIndicatorFileName = "download_in_progress"
 
 def background(f):
     def wrapped(*args, **kwargs):
