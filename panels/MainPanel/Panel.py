@@ -99,12 +99,8 @@ class UI_PT_D2CI(bpy.types.Panel):  # class naming convention ‘CATEGORY_PT_nam
                 col.label(text=str(selectedEntry.get('itemTypeDisplayName')))
 
             row = self.layout.row()
-            col.label(text=str(selectedEntry.get('hash')))
-        elif nPanelWidth < nPanelViewSplit:
-            col = row.column()
-            col.label()
+            col.label(text=', '.join(str(x) for x in selectedEntry.get('customAttributes').get('hashList')))
 
-        if selectedEntry != {}:
             self.layout.separator(factor=2, type="LINE")
             exportModels = self.layout.row()
             exportModels.operator(UI_OT_D2CI_RunRipperExport.bl_idname, text=UI_OT_D2CI_RunRipperExport.bl_label)

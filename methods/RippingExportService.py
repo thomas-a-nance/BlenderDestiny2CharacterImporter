@@ -1,6 +1,7 @@
 import bpy
 import re
 import os
+import shutil
 import subprocess
 from ..methods import helpermethods
 import traceback
@@ -14,20 +15,29 @@ def RipModelAndExport(context):
         context.window_manager.d2ci.IsRippingExport = True
         context.window_manager.d2ci.RippingExportText = "Exporting..."
 
-        itemObjForMDE = {
-            'hash': selectedObj.get('hash'),
-            'name': selectedObj.get('displayProperties').get('name'),
-            'shader': 'shader' in selectedObj.get('customAttributes').get('categories'),
-            'class': selectedObj.get('customAttributes').get('class')
-        }
+        successfulExtract = False
+        for hashNum in selectedObj.get('customAttributes').get('hashList'):
+            itemObjForMDE = {
+                'hash': hashNum,
+                'name': selectedObj.get('displayProperties').get('name'),
+                'shader': 'shader' in selectedObj.get('customAttributes').get('categories'),
+                'class': selectedObj.get('customAttributes').get('class') or ''
+            }
+            
+            exitCode = RunMDE(itemObjForMDE)
+            if exitCode == 0:
+                successfulExtract = True
+                break
 
-        RunMDE(itemObjForMDE)
+        if successfulExtract:
+            context.window_manager.d2ci.RippingExportText = f"Successfully exported {selectedObj.get('displayProperties').get('name')}."
+        else:
+            context.window_manager.d2ci.RippingExportText = f"Failed to export {selectedObj.get('displayProperties').get('name')}."
 
         context.window_manager.d2ci.IsRippingExport = False
-        context.window_manager.d2ci.RippingExportText = f"Successfully exported {selectedObj.get('displayProperties').get('name')}."
     except Exception as e:
         context.window_manager.d2ci.IsRippingExport = False
-        context.window_manager.d2ci.RippingExportText = f"Failed to export {selectedObj.get('displayProperties').get('name')}."
+        context.window_manager.d2ci.RippingExportText = f"Failed to export {selectedObj.get('displayProperties').get('name')} (Exception)."
         print(traceback.format_exc())
 
 def RunMDE(item):
@@ -49,8 +59,9 @@ def RunMDE(item):
 
     exitCode = subprocess.Popen("MontevenDynamicExtractorv1.9.3.exe" + " " + cmdArgs, shell=False, cwd=mdeFilePath).wait()
     if exitCode != 0:
-        raise Exception("MDE Failed")
-    return
+        shutil.rmtree(finalOutputFolder, ignore_errors=True)
+
+    return exitCode
 
 def FixFilePathForArgs(path):
     return path.replace("\\","/")

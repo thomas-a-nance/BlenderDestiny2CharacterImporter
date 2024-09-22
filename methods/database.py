@@ -11,22 +11,25 @@ def QueryManifestByName(manifestName, nameQueryString, rows=4, includeOrnamentsF
     con.create_function("REGEXP", 2, regexp)
     cur = con.cursor()
     try:
-        sqlStr = "SELECT * from " + manifestName + " where"
+        sqlStr = "SELECT id, json, GROUP_CONCAT(json_extract(json, '$.hash')) hashes"
+        sqlStr += " from " + manifestName
+        sqlStr += " where ("
+        sqlStr += " json_extract(json, '$.displayProperties.name') LIKE ?"
         if includeOrnamentsForExotics:
-            sqlStr += " ("
-        sqlStr += " json REGEXP ?"
-        if includeOrnamentsForExotics:
-            sqlStr += " or json REGEXP ?"
-            sqlStr += " )"
-        sqlStr += " and " + GetArmorCategoryJsonQueryFilter()
+            sqlStr += " or json_extract(json, '$.displayProperties.description') LIKE ?"
+        sqlStr += " )"
+        sqlStr += " and json_extract(json, '$.itemSubType') != 0"
+        sqlStr += " and json_extract(json, '$.displayProperties.hasIcon')"
+        sqlStr += " GROUP BY json_extract(json, '$.displayProperties.icon')"
         sqlStr += " limit " + str(rows*8-1)
 
-        cur.execute(sqlStr, ['\"name\":\"[^\"]*' + nameQueryString + '[^\"]*\"', 'change the appearance of [^\.]*' + nameQueryString + '[^\.]*'])
-        
+        cur.execute(sqlStr, ['%'+nameQueryString+'%', '%change the appearance of %'+nameQueryString+'%.'])
         records = cur.fetchall()
         recordsDict = {}
         for record in records:
             recordsDict[record[0]] = json.loads(record[1])
+            recordsDict[record[0]]['customAttributes'] = {}
+            recordsDict[record[0]].get('customAttributes')['hashList'] = record[2].split(',')
         return recordsDict
     except Exception as e:
         raise e
@@ -66,6 +69,9 @@ def GetArmorCategoryJsonQueryFilter(warlock=True, titan=True, hunter=True, head=
         armorSubtypes.append("30")
         armorOrnamentsToGet.append('class')
     
+    #$.itemType
+    #$.itemSubType
+    #$.plug.plugCategoryIdentifier
     armorOrnament = 21
     classSlots = '|'.join(armorClass)
     armorSlots = '|'.join(armorSubtypes)

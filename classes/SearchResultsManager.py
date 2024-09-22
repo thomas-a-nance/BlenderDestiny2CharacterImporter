@@ -110,16 +110,16 @@ class SearchResultsManager():
     def SelectEnumItem(self, value):
         if value in self.QueryResults.keys():
             self.SelectedSearchResultEntry = self.QueryResults.get(value)
-            self.SelectedSearchResultEntry['customAttributes'] = {}
-            self.SelectedSearchResultEntry.get('customAttributes')['categories'] = self.GetCategoryForSelected()
+            if 'customAttributes' not in self.SelectedSearchResultEntry.keys():
+                self.SelectedSearchResultEntry['customAttributes'] = {}
+            self.SelectedSearchResultEntry.get('customAttributes')['categories'] = ''
             self.SelectedSearchResultEntry.get('customAttributes')['ornamentParent'] = ''
             self.SelectedSearchResultEntry.get('customAttributes')['class'] = ''
             
+            self.SelectedSearchResultEntry.get('customAttributes')['categories'] = self.GetCategoryForSelected()
             if 'ornament' in self.SelectedSearchResultEntry.get('customAttributes').get('categories'):
                 self.SelectedSearchResultEntry.get('customAttributes')['ornamentParent'] = self.CheckForOrnamentParent()
-            className = self.CheckForClassCategory()
-            if len(className) > 0:
-                self.SelectedSearchResultEntry.get('customAttributes')['class'] = className
+            self.SelectedSearchResultEntry.get('customAttributes')['class'] = self.CheckForClassCategory()
 
     def ClearEnumItem(self):
         self.SelectedSearchResultEntry = {}
@@ -127,7 +127,7 @@ class SearchResultsManager():
     def GetCategoryForSelected(self):
         categories = []
         classCat = self.CheckForClassCategory()
-        if len(classCat) > 0:
+        if classCat is not None:
             categories.append(classCat)
 
         match self.SelectedSearchResultEntry.get("itemSubType"):
@@ -135,7 +135,9 @@ class SearchResultsManager():
                 categories.append('shader')
             case 21:
                 categories.append('ornament')
-                categories.append(self.CheckForOrnamentCategory())
+                ornamentCategory = self.CheckForOrnamentCategory()
+                if ornamentCategory is not None:
+                    categories.append(ornamentCategory)
             case 26:
                 categories.append('head')
             case 27:
@@ -167,8 +169,9 @@ class SearchResultsManager():
                 return "titan"
             if "hunter" in plugString:
                 return "hunter"
+            return None
         except:
-            return ''
+            return None
 
     def CheckForOrnamentCategory(self):
         try:
@@ -176,7 +179,7 @@ class SearchResultsManager():
             regexQuery = re.search("[a-zA-Z0-9_]*(warlock|titan|hunter)[a-zA-Z0-9_]*(head|arms|chest|legs|class)",plugString)
             return regexQuery.group(2)
         except:
-            return ''
+            return None
     
     def CheckForOrnamentParent(self):
         try:
