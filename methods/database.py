@@ -11,19 +11,49 @@ def QueryManifestByName(manifestName, nameQueryString, rows=4, includeOrnamentsF
     con.create_function("REGEXP", 2, regexp)
     cur = con.cursor()
     try:
-        sqlStr = "SELECT id, json, GROUP_CONCAT(json_extract(json, '$.hash')) hashes"
-        sqlStr += " from " + manifestName
-        sqlStr += " where ("
-        sqlStr += " json_extract(json, '$.displayProperties.name') LIKE ?"
+        sqlStr = """
+            SELECT id
+                ,json
+                ,GROUP_CONCAT(json_extract(json, '$.hash')) hashes
+                ,json_extract(json, '$.displayProperties.name') name
+                ,json_extract(json, '$.displayProperties.description') description
+                ,json_extract(json, '$.displayProperties.hasIcon') hasIcon
+                ,json_extract(json, '$.displayProperties.icon') icon
+                ,json_extract(json, '$.classType') classType
+                ,json_extract(json, '$.itemSubType') itemSubType
+                ,json_extract(json, '$.plug.plugCategoryIdentifier') plugCategoryIdentifier
+            from DestinyInventoryItemDefinition
+            where (
+                name like ?
+        """
+        
         if includeOrnamentsForExotics:
-            sqlStr += " or json_extract(json, '$.displayProperties.description') LIKE ?"
-        sqlStr += " )"
-        sqlStr += " and json_extract(json, '$.itemSubType') != 0"
-        sqlStr += " and json_extract(json, '$.displayProperties.hasIcon')"
-        sqlStr += " GROUP BY json_extract(json, '$.displayProperties.icon')"
-        sqlStr += " limit " + str(rows*8-1)
+            sqlStr += "or description like ?"
+        
+        sqlStr += """
+        )
+            and hasIcon
+            and itemSubType != 0
+            group by icon
+            limit 39
+        """
+        #sqlStr = "SELECT id, json, GROUP_CONCAT(json_extract(json, '$.hash')) hashes"
+        #sqlStr += " from " + manifestName
+        #sqlStr += " where ("
+        #sqlStr += " json_extract(json, '$.displayProperties.name') LIKE ?"
+        #if includeOrnamentsForExotics:
+        #    sqlStr += " or json_extract(json, '$.displayProperties.description') LIKE ?"
+        #sqlStr += " )"
+        #sqlStr += " and json_extract(json, '$.itemSubType') != 0"
+        #sqlStr += " and json_extract(json, '$.displayProperties.hasIcon')"
+        #sqlStr += " GROUP BY json_extract(json, '$.displayProperties.icon')"
+        #sqlStr += " limit " + str(rows*8-1)
+        
+        bindingArgs = ['%'+nameQueryString+'%']
+        if includeOrnamentsForExotics:
+            bindingArgs.append('%change the appearance of %'+nameQueryString+'%.')
 
-        cur.execute(sqlStr, ['%'+nameQueryString+'%', '%change the appearance of %'+nameQueryString+'%.'])
+        cur.execute(sqlStr, bindingArgs)
         records = cur.fetchall()
         recordsDict = {}
         for record in records:
@@ -32,6 +62,7 @@ def QueryManifestByName(manifestName, nameQueryString, rows=4, includeOrnamentsF
             recordsDict[record[0]].get('customAttributes')['hashList'] = record[2].split(',')
         return recordsDict
     except Exception as e:
+        print("DB Query error: "+e.args[0])
         raise e
     finally:
         cur.close()
